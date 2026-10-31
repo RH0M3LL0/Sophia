@@ -7,8 +7,8 @@
 <meta name="description" content="Written online courses you can read on any phone, even on slow networks. Write and publish your own course too.">
 <meta name="theme-color" content="#2447D6">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./assets/images/icon-192.png">
-<link rel="apple-touch-icon" href="./assets/images/icon-192.png">
+<link rel="icon" href="./images/icon-192.png">
+<link rel="apple-touch-icon" href="./images/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
@@ -123,7 +123,7 @@ footer .brand{font-size:18px;color:var(--ink)}footer .brand svg{width:28px;heigh
 <div><h1>Read. Learn. Teach.</h1>
 <p>Written courses you can read on any phone, even on a slow connection. No videos to buffer. Know something worth sharing? Publish your own course.</p>
 <div class="cta"><a class="btn" href="#courses">Browse courses</a><a class="btn alt" href="#write">Write a course</a></div></div>
-<figure><img src="./assets/images/new-hero.png" alt="A smiling student holding her notebooks" width="936" height="684"></figure>
+<figure><img src="./images/new-hero.png" alt="A smiling student holding her notebooks" width="936" height="684"></figure>
 </div></section>
 
 <section class="subjects"><div class="wrap" id="subjects"></div></section>
@@ -161,7 +161,7 @@ footer .brand{font-size:18px;color:var(--ink)}footer .brand svg{width:28px;heigh
 <script>
 /* Supabase: paste your values to save courses to your database. Leave as-is to save in this browser. */
 const SUPABASE_URL='YOUR_SUPABASE_URL',SUPABASE_ANON_KEY='YOUR_SUPABASE_ANON_KEY';
-const IMG='./assets/images/',DEMO=SUPABASE_URL.startsWith('YOUR_');
+const IMG='./images/',DEMO=SUPABASE_URL.startsWith('YOUR_');
 const SUBJ={Programming:{img:'tech.png',c:'#DCE4FF',d:'Code and the web'},Design:{img:'arts-and-crafts.png',c:'#FFE9B8',d:'Arts and graphics'},Chemistry:{img:'chemistry.png',c:'#D8F3E4',d:'Matter and reactions'},Geography:{img:'geography.png',c:'#FDE0D6',d:'Our world'}};
 const SEED=[
 {id:'web-dev',title:'Web Dev',subject:'Programming',author:'Education team',summary:'Build your first web page with HTML, CSS and a little JavaScript.',lessons:[
