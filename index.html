@@ -2110,7 +2110,6 @@
 
 			/* =================================================================
 			   1. CONFIG: paste your Supabase values (Project Settings > API).
-			      Leave as-is to run in demo mode (data saved in this browser).
 			   ================================================================= */
 			const SUPABASE_URL = 'https://jctijixeslyimbqkucyb.supabase.co';
 			const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpjdGlqaXhlc2x5aW1icWt1Y3liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0NzUwOTUsImV4cCI6MjEwOTA1MTA5NX0.EpLt3YK5UdkdHBZlEKfBTBxGS_3p8Z8brnYLh6oWVIY';
@@ -2118,7 +2117,6 @@
 			   Keep any AI API key on the server (e.g. a Supabase Edge Function). */
 			const CHATBOT_ENDPOINT = '';
 			const PASS_MARK = 0.6;
-			const DEMO = SUPABASE_URL.startsWith('YOUR_');
 
 			/* =================================================================
 			   2. CONTENT DATA (rendered into the page by JS to keep HTML short)
@@ -2187,55 +2185,40 @@
 			}
 
 			/* =================================================================
-			   4. DATA LAYER: Supabase when configured, otherwise localStorage
+			   4. DATA LAYER: Supabase
 			   ================================================================= */
 			let sb = null;
 			const state = { user: null, enr: [], bm: [], ready: false, admin: false };
 
 			const store = {
 				async user() {
-					if (sb) { const { data, error } = await sb.auth.getSession(); if (error) throw error; return data.session ? data.session.user : null; }
-					return readJSON('edu_user', null);
+					const { data, error } = await sb.auth.getSession();
+					if (error) throw error;
+					return data.session ? data.session.user : null;
 				},
 				async enrollments() {
-					if (sb) {
-						const { data, error } = await sb.from('enrollments').select('*').eq('user_id', state.user.id);
-						if (error) throw error;
-						return data || [];
-					}
-					return readJSON('edu_enr', []);
+					const { data, error } = await sb.from('enrollments').select('*').eq('user_id', state.user.id);
+					if (error) throw error;
+					return data || [];
 				},
 				async saveEnrollment(e) {
-					if (sb) {
-						const { error } = await sb.from('enrollments').upsert({ user_id: state.user.id, ...e }, { onConflict: 'user_id,course_id' });
-						if (error) throw error;
-					} else {
-						writeJSON('edu_enr', [...readJSON('edu_enr', []).filter(x => x.course_id !== e.course_id), e]);
-					}
+					const { error } = await sb.from('enrollments').upsert({ user_id: state.user.id, ...e }, { onConflict: 'user_id,course_id' });
+					if (error) throw error;
 				},
 				async bookmarks() {
-					if (sb) {
-						const { data, error } = await sb.from('bookmarks').select('course_id').eq('user_id', state.user.id);
-						if (error) throw error;
-						return (data || []).map(r => r.course_id);
-					}
-					return readJSON('edu_bm', []);
+					const { data, error } = await sb.from('bookmarks').select('course_id').eq('user_id', state.user.id);
+					if (error) throw error;
+					return (data || []).map(r => r.course_id);
 				},
 				async setBookmark(id, on) {
-					const has = !on;
-					if (sb) {
-						const q = has
-							? sb.from('bookmarks').delete().eq('user_id', state.user.id).eq('course_id', id)
-							: sb.from('bookmarks').upsert({ user_id: state.user.id, course_id: id }, { onConflict: 'user_id,course_id' });
-						const { error } = await q;
-						if (error) throw error;
-					} else {
-						const saved = readJSON('edu_bm', []);
-						writeJSON('edu_bm', on ? [...new Set([...saved, id])] : saved.filter(x => x !== id));
-					}
+					const q = on
+						? sb.from('bookmarks').upsert({ user_id: state.user.id, course_id: id }, { onConflict: 'user_id,course_id' })
+						: sb.from('bookmarks').delete().eq('user_id', state.user.id).eq('course_id', id);
+					const { error } = await q;
+					if (error) throw error;
 				},
-				async logAttempt(a) { if (sb) { try { await sb.from('quiz_attempts').insert({ user_id: state.user.id, ...a }); } catch (e) { /* history is best-effort */ } } },
-				async logout() { try { if (sb) await sb.auth.signOut(); } catch (e) { /* offline: local session is cleared below */ } localStorage.removeItem('edu_user'); }
+				async logAttempt(a) { try { await sb.from('quiz_attempts').insert({ user_id: state.user.id, ...a }); } catch (e) { /* history is best-effort */ } },
+				async logout() { try { if (sb) await sb.auth.signOut(); } catch (e) { /* offline: local session is cleared below */ } }
 			};
 
 			async function refresh() {
@@ -2305,7 +2288,7 @@
 
 			/* --- pull fresh data; on any failure keep what is already on screen --- */
 			async function syncFromServer() {
-				if (!DEMO && !sb) { setOffline(true); return; }    // library not loaded yet (app opened offline)
+				if (!sb) { setOffline(true); return; }    // library not loaded yet (app opened offline)
 				try {
 					const user = await withTimeout(store.user(), 8000);
 					if (!user) {                                      // genuinely logged out
@@ -2332,7 +2315,7 @@
 
 			/* --- Supabase connection (can be retried when the network returns) --- */
 			async function connectSupabase() {
-				if (DEMO || sb) return;
+				if (sb) return;
 				await loadSupabase();                                // throws when offline
 				sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 				sb.auth.onAuthStateChange((evt, session) => {
@@ -2396,7 +2379,7 @@
 				if (ui.course && state.user && enrOf(ui.course)) openCourse(ui.course);
 			}
 
-			/* Load the Supabase library ONLY when configured (saves ~50KB in demo mode) */
+			/* Load the Supabase library ONLY when configured  */
 			function loadSupabase() {
 				return new Promise((res, rej) => {
 					const s = el('script', { src: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', onload: res, onerror: rej });
@@ -2610,7 +2593,7 @@
 			/* =================================================================
 			   9b. COURSES FROM THE DATABASE, VIDEO LESSONS, ADMIN PAGE
 			   Courses live in the Supabase "courses" table. The built-in list above is
-			   only the fallback (demo mode / empty table / offline with no cache).
+			   only the fallback (empty table / offline with no cache).
 			   ================================================================= */
 			const COURSES_KEY = 'edu_courses';
 			const imgSrc = p => /^(https?:)?\/\//i.test(p) ? p : IMG + p;
@@ -2936,7 +2919,7 @@
 				$('#aPassLabel').textContent = m === 'recovery' ? 'New password' : 'Password';
 				$('#aPass').autocomplete = m === 'login' ? 'current-password' : 'new-password';
 				$$('#authTabs button').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
-				authMessage(DEMO && m === 'login' ? 'Demo mode: Supabase keys not set, accounts are saved in this browser only.' : '', true);
+				authMessage('');
 			}
 
 			async function submitAuth(e) {
@@ -2950,19 +2933,7 @@
 
 				btn.disabled = true; authMessage('');
 				try {
-					if (DEMO) {
-						if (authMode === 'forgot') authMessage('Demo mode: a reset email would be sent here.', true);
-						else {
-							const users = readJSON('edu_users', {});
-							if (authMode === 'register') {
-								if (users[email]) throw new Error('Account already exists.');
-								users[email] = { phone, password: btoa(password) };
-								writeJSON('edu_users', users);
-							} else if (!users[email] || users[email].password !== btoa(password)) throw new Error('Invalid email or password.');
-							writeJSON('edu_user', { id: email, email, phone: users[email].phone });
-							await refresh(); location.hash = '#/dashboard';
-						}
-					} else if (authMode === 'register') {
+					if (authMode === 'register') {
 						const { data, error } = await sb.auth.signUp({ email, password, options: { data: { phone }, emailRedirectTo: location.origin + location.pathname } });
 						if (error) throw error;
 						if (data.session) location.hash = '#/dashboard';
