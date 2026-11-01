@@ -1907,6 +1907,18 @@
 			transition: background-color .3s ease, color .3s ease, border-color .3s ease, box-shadow .3s ease !important;
 		}
 
+		/* smooth light/dark switch: circular reveal; per-element transitions are paused while it runs */
+		html.vt-theme *, html.vt-theme *::before, html.vt-theme *::after { transition: none !important; }
+		::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+		::view-transition-old(root) { z-index: 1; } ::view-transition-new(root) { z-index: 2; }
+		.view.active { animation: viewIn .32s cubic-bezier(.2, .7, .2, 1) both; }
+		@keyframes viewIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+		.chat-win { animation: chatIn .24s cubic-bezier(.2, .8, .2, 1) both; transform-origin: bottom right; }
+		@keyframes chatIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+		.btn, .fchip, .file-row, .side-link, .tab { transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .15s ease, box-shadow .2s ease; }
+		.btn:active { transform: scale(.97); }
+		@media (prefers-reduced-motion: reduce) { .chat-win, .view.active { animation: none !important; } }
+
 		/* ================= v3: white / orange / blue theme, app layout ================= */
 		:root { --accent: #f97316; --accent-dark: #ea580c; --accent-soft: rgba(249,115,22,.12); --side-w: 250px; --tab-h: 64px; }
 		[data-theme="dark"] { --accent-soft: rgba(249,115,22,.2); }
@@ -2705,16 +2717,33 @@
 			   5. THEME
 			   ================================================================= */
 			const getMode = () => { try { return localStorage.getItem('themeMode') || 'system'; } catch (e) { return 'system'; } };
+			/* Light/dark switch: the new theme grows out of the button you tapped (View Transitions).
+			   Browsers without it, or people who prefer less motion, get a short colour fade instead. */
+			let themeOrigin = null;
+			document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#themeBtn, #themeSeg button'); if (b) { const r = b.getBoundingClientRect(); themeOrigin = { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } }, true);
 			function applyTheme(mode) {
 				mode = mode || getMode();
 				const dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-				const root = document.documentElement;
-				root.classList.add('theme-anim'); clearTimeout(applyTheme.timer); applyTheme.timer = setTimeout(() => root.classList.remove('theme-anim'), 450);
-				root.setAttribute('data-theme', dark ? 'dark' : 'light');
-				$('#themeBtn i').className = dark ? 'bx bx-sun' : 'bx bx-moon';
-				$$('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.tmode === mode));
-				const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = dark ? '#0b1220' : '#2563eb';
-				try { localStorage.setItem('themeMode', mode); } catch (e) { }
+				const root = document.documentElement, next = dark ? 'dark' : 'light', changed = root.getAttribute('data-theme') !== next;
+				const paint = () => {
+					root.setAttribute('data-theme', next);
+					$('#themeBtn i').className = dark ? 'bx bx-sun' : 'bx bx-moon';
+					$$('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.tmode === mode));
+					const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = dark ? '#0b1220' : '#2563eb';
+					try { localStorage.setItem('themeMode', mode); } catch (e) { }
+				};
+				if (!changed || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+					if (changed) { root.classList.add('theme-anim'); clearTimeout(applyTheme.timer); applyTheme.timer = setTimeout(() => root.classList.remove('theme-anim'), 400); }
+					return paint();
+				}
+				const o = themeOrigin || { x: innerWidth - 40, y: 30 }; themeOrigin = null;
+				root.classList.add('vt-theme');
+				const vt = document.startViewTransition(paint);
+				vt.ready.then(() => {
+					const r = Math.hypot(Math.max(o.x, innerWidth - o.x), Math.max(o.y, innerHeight - o.y));
+					root.animate({ clipPath: [`circle(0px at ${o.x}px ${o.y}px)`, `circle(${r}px at ${o.x}px ${o.y}px)`] }, { duration: 520, easing: 'cubic-bezier(.4, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' });
+				}).catch(() => { });
+				vt.finished.finally(() => root.classList.remove('vt-theme'));
 			}
 			matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (getMode() === 'system') applyTheme('system'); });
 			let loadingData = true;

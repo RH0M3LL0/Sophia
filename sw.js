@@ -5,7 +5,7 @@
      large, and the browser needs to stream them with range requests.
    - A new version waits until the user taps "Update" in the app (no surprise reloads).
    - Bump VERSION when you add files to PRECACHE. */
-const VERSION = 'v14';
+const VERSION = 'v15';
 const STATIC_CACHE = `edu-static-${VERSION}`;
 const IMAGE_CACHE = `edu-images-${VERSION}`;
 const CDN_CACHE = `edu-cdn-${VERSION}`;
