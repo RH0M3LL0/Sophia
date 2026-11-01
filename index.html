@@ -3297,7 +3297,8 @@
 				const src = own(m.audio_url) ? { url: m.audio_url } : own(m.video_url) ? { url: m.video_url }
 					: (m.docs.find(d => own(d.url) && /\.(pdf|txt|md|mp3|m4a|wav|ogg|webm|mp4|mov)$/i.test(d.name)) || null);
 				if (!src) return toast('Upload a video, record a voice note, or add a PDF or audio file to this lesson first.', 5000);
-				m.tbusy = true; renderEditor(); toast('Transcribing. This can take a minute or two.', 6000);
+				m.tbusy = true; m.t0 = Date.now(); renderEditor(); toast('Transcribing. Small files take under a minute, long videos can take a few.', 6000);
+				const tick = setInterval(() => { const b = document.querySelector(`[data-ed="transcribe"][data-m="${m.k}"]`); if (b) { const sec = Math.floor((Date.now() - m.t0) / 1000); b.lastChild.textContent = ` Transcribing… ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`; } }, 1000);
 				try {
 					const { data } = await sb.auth.getSession();
 					if (!data.session) throw new Error('Please log in again.');
@@ -3314,7 +3315,7 @@
 				} catch (e) {
 					const net = e instanceof TypeError || e.name === 'TimeoutError' || e.name === 'AbortError';
 					toast('Could not transcribe: ' + (net ? 'no response from the server. Is the transcribe function deployed?' : e.message), 7000);
-				} finally { m.tbusy = false; renderEditor(); }
+				} finally { clearInterval(tick); m.tbusy = false; renderEditor(); }
 			}
 
 			async function saveCourse(ev) {
