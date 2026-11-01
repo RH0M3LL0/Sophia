@@ -2109,6 +2109,199 @@
 		}
 	</style>
 
+	<style id="extra-motion-2">
+		/* ===== Motion layer 2 (additive): easing, buttons, switches, transitions, backgrounds, images =====
+		   Compose utilities, e.g.  class="a-slide-up ease-in-out delay-2"
+		   Animations : a-fade-in a-fade-out a-shrink-in a-shrink-out a-slide-up a-slide-down a-slide-left a-slide-right
+		                a-flip a-rotate a-bounce a-zoom a-blur a-shake a-heartbeat a-glow a-float a-clip
+		   Easing     : ease-in ease-out ease-in-out ease-spring     Speed: dur-fast dur-slow     Delay: delay-1 .. delay-5
+		   Hover      : h-grow h-shrink h-lift h-tilt
+		   Buttons    : btn-outline(wipe) btn-gradient btn-glow btn-pill btn-3d btn-soft btn-ghost btn-expand btn-grow btn-shrink
+		                btn-bounce btn-swap  + states .is-loading .is-done .is-error   (JS helper: btnState(btn,'loading'|'done'|'error'|''))
+		   Backgrounds: bg-animated bg-aurora bg-dots bg-grid
+		   Images     : img-rounded img-circle img-blob img-frame img-polaroid img-gray img-kenburns img-reveal img-glow img-zoom-wrap img-shine-wrap
+		   Reveal     : data-reveal="flip|bounce|rotate|down|clip|shrink"  */
+
+		:root {
+			--e-in: cubic-bezier(.4, 0, 1, 1);
+			--e-out: cubic-bezier(0, 0, .2, 1);
+			--e-io: cubic-bezier(.65, 0, .35, 1);
+			--e-expo: cubic-bezier(.16, 1, .3, 1);
+			--e-spring: cubic-bezier(.34, 1.56, .64, 1);
+		}
+
+		/* ---- Keyframes ---- */
+		@keyframes mSlideUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+		@keyframes mSlideDown { from { opacity: 0; transform: translateY(-24px) } to { opacity: 1; transform: none } }
+		@keyframes mSlideLeft { from { opacity: 0; transform: translateX(40px) } to { opacity: 1; transform: none } }
+		@keyframes mSlideRight { from { opacity: 0; transform: translateX(-40px) } to { opacity: 1; transform: none } }
+		@keyframes mFlipIn { from { opacity: 0; transform: perspective(700px) rotateX(-70deg) } to { opacity: 1; transform: perspective(700px) rotateX(0) } }
+		@keyframes mRotateIn { from { opacity: 0; transform: rotate(-8deg) scale(.9) } to { opacity: 1; transform: none } }
+		@keyframes mBounceIn { 0% { opacity: 0; transform: scale(.3) } 50% { opacity: 1; transform: scale(1.08) } 70% { transform: scale(.95) } 100% { transform: scale(1) } }
+		@keyframes mShake { 10%, 90% { transform: translateX(-2px) } 20%, 80% { transform: translateX(4px) } 30%, 50%, 70% { transform: translateX(-6px) } 40%, 60% { transform: translateX(6px) } }
+		@keyframes mHeartbeat { 0%, 100% { transform: scale(1) } 15% { transform: scale(1.14) } 30% { transform: scale(1) } 45% { transform: scale(1.1) } }
+		@keyframes mGradient { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
+		@keyframes mGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0), 0 6px 18px rgba(37, 99, 235, .25) } 50% { box-shadow: 0 0 0 6px rgba(37, 99, 235, .14), 0 10px 28px rgba(37, 99, 235, .45) } }
+		@keyframes mKenBurns { from { transform: scale(1) translate(0, 0) } to { transform: scale(1.14) translate(-2%, -2%) } }
+		@keyframes mClipUp { from { clip-path: inset(100% 0 0 0) } to { clip-path: inset(0) } }
+		@keyframes mSpin { to { transform: rotate(360deg) } }
+		@keyframes mThemeSwap { 0% { transform: rotate(0) scale(1) } 45% { transform: rotate(180deg) scale(.4) } 100% { transform: rotate(360deg) scale(1) } }
+		@keyframes mAurora { 0%, 100% { transform: translate(0, 0) rotate(0) } 33% { transform: translate(6%, -8%) rotate(40deg) } 66% { transform: translate(-8%, 6%) rotate(-30deg) } }
+		@keyframes mDots { to { background-position: 28px 28px } }
+		@keyframes mBlobMorph { 0%, 100% { border-radius: 60% 40% 55% 45% / 55% 45% 60% 40% } 50% { border-radius: 40% 60% 45% 55% / 45% 60% 40% 55% } }
+		@keyframes mShineSweep { from { transform: translateX(-120%) skewX(-20deg) } to { transform: translateX(420%) skewX(-20deg) } }
+		@keyframes mViewIn { from { opacity: 0; transform: translateY(18px) scale(.985); filter: blur(6px) } to { opacity: 1; transform: none; filter: none } }
+
+		/* ---- Animation utilities (compose with easing / speed / delay) ---- */
+		.a-fade-in { animation: xFadeIn var(--dur, .6s) var(--ease, var(--e-io)) var(--delay, 0s) both }
+		.a-fade-out { animation: xFadeOut var(--dur, .4s) var(--ease, var(--e-io)) var(--delay, 0s) both }
+		.a-shrink-in { animation: xShrinkIn var(--dur, .5s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-shrink-out { animation: xShrinkOut var(--dur, .35s) var(--ease, var(--e-io)) var(--delay, 0s) both }
+		.a-slide-up { animation: mSlideUp var(--dur, .6s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-slide-down { animation: mSlideDown var(--dur, .6s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-slide-left { animation: mSlideLeft var(--dur, .6s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-slide-right { animation: mSlideRight var(--dur, .6s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-flip { animation: mFlipIn var(--dur, .7s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-rotate { animation: mRotateIn var(--dur, .6s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-bounce { animation: mBounceIn var(--dur, .8s) var(--ease, var(--e-out)) var(--delay, 0s) both }
+		.a-zoom { animation: xZoomPop var(--dur, .55s) var(--ease, var(--e-spring)) var(--delay, 0s) both }
+		.a-blur { animation: xBlurIn var(--dur, .7s) var(--ease, var(--e-out)) var(--delay, 0s) both }
+		.a-clip { animation: mClipUp var(--dur, .8s) var(--ease, var(--e-expo)) var(--delay, 0s) both }
+		.a-shake { animation: mShake .55s var(--e-io) var(--delay, 0s) both }
+		.a-heartbeat { animation: mHeartbeat 1.6s var(--e-io) infinite }
+		.a-glow { animation: mGlow 2.4s var(--e-io) infinite }
+		.a-float { animation: xFloat 4s var(--e-io) infinite }
+		.ease-in { --ease: var(--e-in) }
+		.ease-out { --ease: var(--e-out) }
+		.ease-in-out { --ease: var(--e-io) }
+		.ease-spring { --ease: var(--e-spring) }
+		.dur-fast { --dur: .25s }
+		.dur-slow { --dur: 1.2s }
+		.delay-1 { --delay: .1s } .delay-2 { --delay: .2s } .delay-3 { --delay: .3s } .delay-4 { --delay: .4s } .delay-5 { --delay: .5s }
+
+		/* ---- Hover utilities ---- */
+		.h-grow, .h-shrink, .h-lift, .h-tilt { transition: transform .4s var(--e-io), box-shadow .4s var(--e-io) }
+		.h-grow:hover { transform: scale(1.06) }
+		.h-shrink:hover { transform: scale(.95) }
+		.h-lift:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg) }
+		.h-tilt:hover { transform: perspective(700px) rotateX(4deg) rotateY(-6deg) scale(1.03) }
+
+		/* ---- Page & section transitions ---- */
+		.view.active { animation: mViewIn .55s var(--e-expo) both }
+		.view.active > .panel, .view.active .page-head { animation: mSlideUp .6s var(--e-expo) both }
+		.view.active > .panel:nth-child(2) { animation-delay: .06s }
+		.view.active > .panel:nth-child(3) { animation-delay: .12s }
+		.view.active > .panel:nth-child(4) { animation-delay: .18s }
+		.view.active > .panel:nth-child(5) { animation-delay: .24s }
+		.view.active > .panel:nth-child(n+6) { animation-delay: .3s }
+		[data-reveal="flip"].in { animation-name: mFlipIn }
+		[data-reveal="bounce"].in { animation-name: mBounceIn }
+		[data-reveal="rotate"].in { animation-name: mRotateIn }
+		[data-reveal="down"].in { animation-name: mSlideDown }
+		[data-reveal="clip"].in { animation-name: mClipUp }
+		[data-reveal="shrink"].in { animation-name: xShrinkIn }
+		.stat-card[data-reveal].in { animation-name: mBounceIn }
+		.feature[data-reveal].in { animation-name: mFlipIn }
+
+		/* ---- Buttons ---- */
+		.btn { isolation: isolate; transition: transform .35s var(--e-io), box-shadow .35s var(--e-io), background .35s var(--e-io), color .35s var(--e-io), letter-spacing .35s var(--e-io), padding .35s var(--e-io) }
+		/* outline buttons: fill wipes up from the bottom instead of snapping */
+		.btn-outline::before { content: ""; position: absolute; inset: 0; background: var(--primary); transform: scaleY(0); transform-origin: 50% 100%; transition: transform .45s var(--e-expo); z-index: -1 }
+		.btn-outline:hover:not(:disabled) { background: transparent; color: #fff }
+		.btn-outline:hover:not(:disabled)::before { transform: scaleY(1); transform-origin: 50% 0 }
+		/* variants */
+		.btn-gradient, .btn-gradient:hover { --grad: linear-gradient(120deg, #2563eb, #7c3aed, #06b6d4, #2563eb); background: var(--grad) 0 50% / 300% 300%; animation: mGradient 6s var(--e-io) infinite }
+		.btn-glow { animation: mGlow 2.4s var(--e-io) infinite }
+		.btn-pill { border-radius: 999px }
+		.btn-3d { box-shadow: 0 5px 0 var(--primary-dark) }
+		.btn-3d:hover { transform: translateY(-1px); box-shadow: 0 6px 0 var(--primary-dark) }
+		.btn-3d:active { transform: translateY(5px) !important; box-shadow: 0 0 0 var(--primary-dark) }
+		.btn-soft { background: rgba(37, 99, 235, .12); color: var(--primary) }
+		.btn-soft:hover { background: var(--primary); color: #fff }
+		.btn-ghost { background: transparent; color: var(--primary) }
+		.btn-ghost:hover { background: rgba(37, 99, 235, .12); box-shadow: none; color: var(--primary-dark) }
+		.btn-expand:hover { letter-spacing: .06em; padding-inline: 30px }
+		.btn-grow:hover { transform: scale(1.08) }
+		.btn-shrink:hover { transform: scale(.94) }
+		.btn-bounce:hover { animation: xZoomPop .5s var(--e-spring) }
+		/* text-swap button: <button class="btn btn-swap"><span data-hover="Enroll now">Enroll</span></button> */
+		.btn-swap span { position: relative; display: inline-block; transition: transform .45s var(--e-expo) }
+		.btn-swap span::after { content: attr(data-hover); position: absolute; left: 50%; top: 100%; white-space: nowrap; transform: translateX(-50%) }
+		.btn-swap:hover span { transform: translateY(-100%) }
+		/* states */
+		.btn.is-loading { pointer-events: none; color: transparent !important }
+		.btn.is-loading .bx { opacity: 0 }
+		.btn.is-loading::before { content: ""; position: absolute; z-index: 1; inset: auto; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; background: transparent; border: 2px solid rgba(255, 255, 255, .4); border-top-color: #fff; border-radius: 50%; transform: none; animation: mSpin .7s linear infinite }
+		.btn-outline.is-loading::before { border-color: rgba(37, 99, 235, .25); border-top-color: var(--primary) }
+		.btn.is-done { animation: xZoomPop .5s var(--e-spring); background: #16a34a }
+		.btn.is-error { animation: mShake .5s var(--e-io); background: #dc2626 }
+
+		/* ---- Switches & segmented controls ---- */
+		.check input[type="checkbox"], input[type="checkbox"].switch { appearance: none; -webkit-appearance: none; flex: none; width: 44px; height: 26px; margin-right: 10px; vertical-align: middle; border-radius: 99px; background: var(--border); position: relative; cursor: pointer; transition: background .35s var(--e-io), box-shadow .35s var(--e-io) }
+		.check input[type="checkbox"]::after, input[type="checkbox"].switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); transition: transform .4s var(--e-spring), width .25s var(--e-io) }
+		.check input[type="checkbox"]:checked, input[type="checkbox"].switch:checked { background: var(--primary); animation: none }
+		.check input[type="checkbox"]:checked::after, input[type="checkbox"].switch:checked::after { transform: translateX(18px) }
+		.check input[type="checkbox"]:active::after, input[type="checkbox"].switch:active::after { width: 26px }
+		.check input[type="checkbox"]:checked:active::after, input[type="checkbox"].switch:checked:active::after { transform: translateX(12px) }
+		.check input[type="checkbox"]:focus-visible, input[type="checkbox"].switch:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, .25) }
+		.seg { position: relative }
+		.seg button { position: relative; z-index: 1; transition: color .35s var(--e-io), transform .2s var(--e-io) }
+		.seg button:active { transform: scale(.94) }
+		.seg .seg-ind { position: absolute; top: 0; bottom: 0; left: 0; width: 0; background: var(--primary); z-index: 0; transition: transform .45s var(--e-expo), width .45s var(--e-expo), opacity .2s }
+		.seg.has-ind button.on { background: transparent }
+		#themeBtn.x-spin i { animation: mThemeSwap .6s var(--e-io) }
+		.side-link.on .bx { animation: xZoomPop .5s var(--e-spring) }
+
+		/* ---- Cards: pointer tilt (JS sets --rx / --ry) ---- */
+		.course-card.x-tilt, .stat-card.x-tilt { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px); transition: transform .12s linear, box-shadow .45s var(--e-io) }
+		.course-card:hover .course-img { transform: scale(1.1) rotate(-3deg) translateY(-6px) }
+
+		/* ---- Background animations ---- */
+		.bg-animated { background: linear-gradient(120deg, #eff6ff, #f5f3ff, #ecfeff, #eff6ff); background-size: 300% 300%; animation: mGradient 14s var(--e-io) infinite }
+		[data-theme="dark"] .bg-animated { background: linear-gradient(120deg, #0b1220, #1e1b4b, #0c2a3a, #0b1220); background-size: 300% 300% }
+		.bg-aurora { position: relative; overflow: hidden; isolation: isolate }
+		.bg-aurora::before, .bg-aurora::after { content: ""; position: absolute; z-index: -1; width: 55%; aspect-ratio: 1; border-radius: 50%; filter: blur(80px); opacity: .35; pointer-events: none; animation: mAurora 18s var(--e-io) infinite }
+		.bg-aurora::before { background: #60a5fa; top: -20%; left: -10% }
+		.bg-aurora::after { background: #c084fc; bottom: -25%; right: -10%; animation-delay: -9s }
+		.bg-dots { background-image: radial-gradient(var(--border) 1.5px, transparent 1.5px); background-size: 28px 28px; animation: mDots 4s linear infinite }
+		.bg-grid { background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 36px 36px; animation: mDots 6s linear infinite }
+		/* built-in: hero + loading screen get a slow colour drift */
+		.hero { background: linear-gradient(135deg, var(--soft), var(--bg)); background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 9%, var(--bg)), var(--bg), color-mix(in srgb, #8b5cf6 9%, var(--bg)), var(--bg)); background-size: 300% 300%; animation: mGradient 16s var(--e-io) infinite }
+		.splash { background: linear-gradient(135deg, var(--bg), color-mix(in srgb, var(--primary) 12%, var(--bg)), var(--bg)); background-size: 300% 300%; animation: mGradient 5s var(--e-io) infinite }
+		.splash-inner .bx { animation: mHeartbeat 1.6s var(--e-io) infinite }
+		.splash-inner strong { animation: mSlideUp .7s var(--e-expo) .15s both }
+
+		/* ---- Image styles ---- */
+		.img-rounded { border-radius: 16px }
+		.img-circle { border-radius: 50%; aspect-ratio: 1; object-fit: cover }
+		.img-blob { object-fit: cover; border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%; animation: mBlobMorph 9s var(--e-io) infinite }
+		.img-frame { border: 6px solid var(--surface); border-radius: 14px; box-shadow: var(--shadow-lg) }
+		.img-polaroid { padding: 10px 10px 34px; background: #fff; box-shadow: var(--shadow); transform: rotate(-2deg); transition: transform .5s var(--e-spring) }
+		.img-polaroid:hover { transform: rotate(0) scale(1.04) }
+		.img-gray { filter: grayscale(1); transition: filter .6s var(--e-io) }
+		.img-gray:hover { filter: none }
+		.img-kenburns { animation: mKenBurns 12s var(--e-io) infinite alternate }
+		.img-reveal { animation: mClipUp .9s var(--e-expo) both }
+		.img-glow:hover { filter: drop-shadow(0 12px 28px rgba(37, 99, 235, .45)) }
+		.img-zoom-wrap { overflow: hidden; border-radius: var(--radius) }
+		.img-zoom-wrap img { transition: transform .8s var(--e-expo) }
+		.img-zoom-wrap:hover img { transform: scale(1.1) }
+		.img-shine-wrap { position: relative; overflow: hidden }
+		.img-shine-wrap::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 25%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent); transform: translateX(-120%) skewX(-20deg); pointer-events: none }
+		.img-shine-wrap:hover::after { animation: mShineSweep .9s var(--e-io) }
+		/* built-in: reviewer avatars, hero + about photos */
+		.user img { border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--primary); transition: transform .45s var(--e-spring) }
+		.user img:hover { transform: scale(1.12) rotate(6deg) }
+		.hero img[src*="students"] { filter: drop-shadow(0 24px 30px rgba(37, 99, 235, .28)) }
+		img[src*="about-page"] { border-radius: var(--radius); box-shadow: 0 0 0 6px var(--surface), 0 22px 50px rgba(37, 99, 235, .25); transition: transform .6s var(--e-expo), box-shadow .6s var(--e-expo) }
+		img[src*="about-page"]:hover { transform: translateY(-6px) rotate(-1deg) scale(1.02) }
+
+		@media (prefers-reduced-motion: reduce) {
+			.bg-animated, .bg-aurora::before, .bg-aurora::after, .bg-dots, .bg-grid, .hero, .splash, .img-blob, .img-kenburns, .btn-gradient, .btn-glow { animation: none !important }
+			.course-card.x-tilt, .stat-card.x-tilt { transform: none }
+		}
+	</style>
+
 	<noscript><style>[data-reveal]:not(.in) { opacity: 1 !important; } .splash { display: none; }</style></noscript>
 </head>
 
@@ -4135,6 +4328,68 @@
 		new MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(function(n){
 			if(n.nodeType!==1) return; if(n.tagName==='IMG') prep(n); else n.querySelectorAll && n.querySelectorAll('img').forEach(prep);
 		}); }); }).observe(document.body,{childList:true,subtree:true});
+	})();
+	</script>
+
+	<script id="extra-motion-js-2">
+	(function(){
+		var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		// Button state helper: btnState(btn, 'loading' | 'done' | 'error' | '')
+		window.btnState = function(b, s){
+			if(!b) return;
+			b.classList.remove('is-loading','is-done','is-error');
+			if(s){ void b.offsetWidth; b.classList.add('is-' + s); }
+			if(s === 'done' || s === 'error') setTimeout(function(){ b.classList.remove('is-' + s); }, 1600);
+		};
+
+		// Segmented controls: a sliding highlight follows the active option
+		function place(seg){
+			var ind = seg._ind, on = seg.querySelector('button.on');
+			if(!ind) return;
+			if(!on || !on.offsetWidth){ ind.style.opacity = 0; return; }
+			ind.style.opacity = 1; ind.style.width = on.offsetWidth + 'px'; ind.style.transform = 'translateX(' + on.offsetLeft + 'px)';
+		}
+		function initSeg(seg){
+			if(seg._ind) return;
+			var ind = document.createElement('span'); ind.className = 'seg-ind';
+			seg.insertBefore(ind, seg.firstChild); seg._ind = ind; seg.classList.add('has-ind');
+			place(seg);
+			new MutationObserver(function(){ place(seg); }).observe(seg, {attributes:true, subtree:true, attributeFilter:['class']});
+			if(window.ResizeObserver) new ResizeObserver(function(){
+				ind.style.transition = 'none'; place(seg);
+				requestAnimationFrame(function(){ ind.style.transition = ''; });
+			}).observe(seg);
+		}
+		var queued = false;
+		function scanSeg(){ queued = false; document.querySelectorAll('.seg:not(.has-ind)').forEach(initSeg); }
+		scanSeg();
+		new MutationObserver(function(){ if(!queued){ queued = true; requestAnimationFrame(scanSeg); } }).observe(document.body, {childList:true, subtree:true});
+
+		if(rm) return;
+
+		// Theme button: icon spins while it swaps sun/moon
+		document.addEventListener('click', function(e){
+			var b = e.target.closest && e.target.closest('#themeBtn'); if(!b) return;
+			b.classList.remove('x-spin'); void b.offsetWidth; b.classList.add('x-spin');
+			setTimeout(function(){ b.classList.remove('x-spin'); }, 650);
+		}, true);
+
+		// Cards tilt toward the pointer (mouse/trackpad only)
+		if(matchMedia('(hover: hover) and (pointer: fine)').matches){
+			var cur = null;
+			function reset(c){ c.classList.remove('x-tilt'); c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); }
+			document.addEventListener('pointermove', function(e){
+				var c = e.target.closest && e.target.closest('.course-card,.stat-card');
+				if(cur && cur !== c){ reset(cur); cur = null; }
+				if(!c) return;
+				var r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+				c.style.setProperty('--rx', (-y * 7).toFixed(2) + 'deg');
+				c.style.setProperty('--ry', (x * 9).toFixed(2) + 'deg');
+				c.classList.add('x-tilt'); cur = c;
+			}, {passive:true});
+			document.addEventListener('mouseleave', function(){ if(cur){ reset(cur); cur = null; } });
+		}
 	})();
 	</script>
 
