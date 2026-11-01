@@ -1613,6 +1613,14 @@
 		.up-item { font-size: 13px; margin-bottom: 8px; } .up-item span { display: block; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 		.ed-bar { display: flex; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
 		.ed-bar .btn { flex: 1; min-width: 130px; }
+		.ed-bar { padding-right: 76px; } .admin-form { padding-bottom: 28px; }
+		.up-ok, .up-err { display: flex; align-items: flex-start; gap: 8px; padding: 9px 11px; border-radius: 10px; font-size: 13px; margin: 8px 0; line-height: 1.4; }
+		.up-ok { background: #ecfdf5; border: 1px solid #86efac; color: #166534; } .up-err { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+		.up-ok > i, .up-err > i { font-size: 18px; flex: none; } .up-ok span, .up-err span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+		.up-ok button, .up-err button { border: 0; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
+		.up-run { border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; margin: 8px 0; background: var(--soft); }
+		.chip.ok { border-color: #86efac; background: #f0fdf4; } .chip.ok .tick { color: #16a34a; font-size: 13px; flex: none; white-space: nowrap; }
+		@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .up-ok { background: #052e16; border-color: #166534; color: #bbf7d0; } :root:not([data-theme="light"]) .up-err { background: #450a0a; border-color: #991b1b; color: #fecaca; } :root:not([data-theme="light"]) .chip.ok { background: #052e16; border-color: #166534; } }
 		.file-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; color: var(--text); text-decoration: none; background: var(--surface); }
 		.file-row i { font-size: 22px; color: var(--primary); flex: none; } .file-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; } .file-row small { color: var(--muted); }
 		.audio-panel audio { width: 100%; margin-top: 8px; }
@@ -2277,11 +2285,12 @@
 							<div class="cover-side">
 								<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-image-add"></i> Upload cover<input type="file" accept="image/*" data-f="cover" hidden></label>
 								<input id="admImg" data-fld="cover" placeholder="or paste an image link" autocomplete="off" inputmode="url">
-							</div></div></div>
+							</div></div><div id="cvUps"></div></div>
 
 					<div class="ed-step"><span class="ed-n">2</span> Course documents <small>PDF, Word, slides, sheets, any file</small></div>
 					<div class="chips" id="edDocs"></div>
 					<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-upload"></i> Upload documents<input type="file" multiple data-f="cdoc" hidden></label>
+					<div id="edUps"></div>
 
 					<div class="ed-step"><span class="ed-n">3</span> Lessons <small>Each lesson can have a video, a voice note, links and files</small></div>
 					<div id="edMods"></div>
@@ -3088,9 +3097,9 @@
 			   ed = the course being edited. Text fields sync into it as you type; buttons that change
 			   the structure (add/remove/upload) redraw the lesson cards. */
 			const BUCKET = 'course-files', MAX_UPLOAD = 50 * 1024 * 1024;
-			let ed = { cover: '', docs: [], mods: [] }, busy = 0, rec = null;
+			let ed = { cover: '', docs: [], mods: [], ups: [], cvups: [] }, busy = 0, rec = null;
 			const uid = () => Math.random().toString(36).slice(2, 8);
-			const blankMod = () => ({ k: uid(), title: '', video_url: '', audio_url: '', lesson: '', transcript: '', docs: [], links: [], linkOpen: false });
+			const blankMod = () => ({ ups: [], k: uid(), title: '', video_url: '', audio_url: '', lesson: '', transcript: '', docs: [], links: [], linkOpen: false });
 			const safeName = n => (String(n).normalize('NFKD').replace(/[^\w.\-]+/g, '_').replace(/^_+|_+$/g, '').slice(-80)) || 'file';
 			const fmtSize = b => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
 			const httpUrl = u => /^https?:\/\/\S+$/i.test(u || '') ? u : '';
@@ -3130,17 +3139,32 @@
 					return { name, size: file.size, url: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}` };
 				})();
 			}
-			async function doUpload(file, name) {
-				const row = el('div', { className: 'up-item' }, el('span', { textContent: name }));
-				const bar = el('div', { className: 'bar' }, el('i')); row.append(bar);
-				$('#upList').append(row); busy++; $('#admSave').disabled = true;
-				try { return await uploadFile(file, name, p => { bar.firstChild.style.width = Math.round(p * 100) + '%'; }); }
-				catch (e) { toast(e.message, 6000); return null; }
-				finally { row.remove(); if (!--busy) $('#admSave').disabled = false; }
+			/* upload status is shown right under the button that started it (progress, then a green tick or a red error) */
+			function upHtml(list) {
+				return (list || []).map(u => u.state === 'up'
+					? `<div class="up-run" id="u_${u.id}"><div style="font-size:13px;margin-bottom:6px">Uploading <b>${esc(u.name)}</b> <span class="pc">${u.pct}%</span> · keep this page open</div><div class="bar"><i style="width:${u.pct}%"></i></div></div>`
+					: u.state === 'ok'
+						? `<div class="up-ok" role="status"><i class="bx bx-check-circle"></i><span>Uploaded <b>${esc(u.name)}</b> (${fmtSize(u.size)}). Press <b>Save course</b> to keep it.</span><button type="button" data-ed="dismissup" data-u="${u.id}" aria-label="Dismiss">&times;</button></div>`
+						: `<div class="up-err" role="alert"><i class="bx bx-error-circle"></i><span><b>${esc(u.name)}</b> did not upload. ${esc(u.msg)}</span><button type="button" data-ed="dismissup" data-u="${u.id}" aria-label="Dismiss">&times;</button></div>`).join('');
+			}
+			async function doUpload(file, name, owner) {
+				owner = owner || ed.ups;
+				const u = { id: uid(), name, pct: 0, state: 'up', size: file.size, msg: '' };
+				owner.push(u); busy++; $('#admSave').disabled = true; $('#admSave').textContent = 'Uploading…'; renderEditor();
+				try {
+					const f = await uploadFile(file, name, p => {
+						u.pct = Math.round(p * 100);
+						const row = document.getElementById('u_' + u.id);
+						if (row) { row.querySelector('.bar > i').style.width = u.pct + '%'; row.querySelector('.pc').textContent = u.pct + '%'; }
+					});
+					u.state = 'ok'; toast('✓ Uploaded ' + name); setTimeout(() => { const i = owner.indexOf(u); if (i > -1) { owner.splice(i, 1); renderEditor(); } }, 12000);
+					return f;
+				} catch (e) { u.state = 'err'; u.msg = e.message; toast(e.message, 6000); return null; }
+				finally { if (!--busy) { $('#admSave').disabled = false; $('#admSave').textContent = 'Save course'; } renderEditor(); }
 			}
 
 			function chipHtml(f, act, k, i) {
-				return `<div class="chip"><i class="bx ${fileIcon(f.name)}"></i><span class="nm">${esc(f.name)}</span>${f.size ? `<small>${fmtSize(f.size)}</small>` : ''}<button class="x" type="button" data-ed="${act}" data-m="${k || ''}" data-i="${i}" aria-label="Remove">&times;</button></div>`;
+				return `<div class="chip ok"><i class="bx ${fileIcon(f.name)}"></i><span class="nm">${esc(f.name)}</span>${f.size ? `<small>${fmtSize(f.size)}</small>` : ''}<span class="tick">✓ Uploaded</span><button class="x" type="button" data-ed="${act}" data-m="${k || ''}" data-i="${i}" aria-label="Remove">&times;</button></div>`;
 			}
 			function modHtml(m, n) {
 				const recHere = rec && rec.k === m.k, last = n === ed.mods.length - 1;
@@ -3150,8 +3174,8 @@
 						<button type="button" data-ed="up" data-m="${m.k}" ${n ? '' : 'disabled'} aria-label="Move up">&uarr;</button>
 						<button type="button" data-ed="down" data-m="${m.k}" ${last ? 'disabled' : ''} aria-label="Move down">&darr;</button>
 						<button type="button" data-ed="rmmod" data-m="${m.k}" aria-label="Delete lesson" style="color:#dc2626">&times;</button></div>
-					${m.video_url ? `<div class="chip"><i class="bx bx-video"></i><span class="nm">${esc(vname)}</span><button class="x" type="button" data-ed="rmvid" data-m="${m.k}" aria-label="Remove video">&times;</button></div>` : ''}
-					${m.audio_url ? `<audio controls preload="none" src="${esc(m.audio_url)}"></audio><div class="chip"><i class="bx bx-microphone"></i><span class="nm">Voice lesson</span><button class="x" type="button" data-ed="rmaud" data-m="${m.k}" aria-label="Remove voice">&times;</button></div>` : ''}
+					${m.video_url ? `<div class="chip ok"><i class="bx bx-video"></i><span class="nm">${esc(vname)}</span><span class="tick">✓ Added</span><button class="x" type="button" data-ed="rmvid" data-m="${m.k}" aria-label="Remove video">&times;</button></div>` : ''}
+					${m.audio_url ? `<audio controls preload="none" src="${esc(m.audio_url)}"></audio><div class="chip ok"><i class="bx bx-microphone"></i><span class="nm">Voice lesson</span><span class="tick">✓ Saved</span><button class="x" type="button" data-ed="rmaud" data-m="${m.k}" aria-label="Remove voice">&times;</button></div>` : ''}
 					${recHere ? `<div class="rec-live"><i></i><span>Recording <b id="recTime">0:00</b></span><button class="btn btn-sm" type="button" data-ed="stoprec" style="margin-left:auto">Stop</button></div>` : ''}
 					<div class="media-btns">
 						<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-video-plus"></i> Upload video<input type="file" accept="video/*" data-f="video" data-m="${m.k}" hidden></label>
@@ -3159,6 +3183,7 @@
 						<button class="btn btn-sm btn-outline" type="button" data-ed="linkbox" data-m="${m.k}"><i class="bx bx-link"></i> Paste link</button>
 						<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-upload"></i> Add files<input type="file" multiple data-f="mdoc" data-m="${m.k}" hidden></label>
 					</div>
+					${upHtml(m.ups)}
 					${m.linkOpen ? `<div class="ed-row"><input data-fld="newlink" data-m="${m.k}" placeholder="YouTube, Vimeo, .mp4 or any web link" inputmode="url" autocomplete="off"><button class="btn btn-sm" type="button" data-ed="addlink" data-m="${m.k}">Add</button></div><small class="muted">YouTube, Vimeo and .mp4 links play in the lesson. Other links show as a reference link.</small>` : ''}
 					${m.docs.length ? `<div class="chips" style="margin-top:8px">${m.docs.map((f, i) => chipHtml(f, 'rmmdoc', m.k, i)).join('')}</div>` : ''}
 					${m.links.length ? `<div class="chips" style="margin-top:8px">${m.links.map((l, i) => `<div class="chip"><i class="bx bx-link"></i><span class="nm">${esc(l.label || l.url)}</span><button class="x" type="button" data-ed="rmlink" data-m="${m.k}" data-i="${i}" aria-label="Remove link">&times;</button></div>`).join('')}</div>` : ''}
@@ -3172,6 +3197,7 @@
 			function renderEditor() {
 				$('#cvPrev').innerHTML = ed.cover ? `<img src="${esc(imgSrc(ed.cover))}" alt="Cover preview">` : 'No cover yet';
 				if (document.activeElement !== $('#admImg')) $('#admImg').value = /^https?:/i.test(ed.cover) ? ed.cover : '';
+				$('#cvUps').innerHTML = upHtml(ed.cvups); $('#edUps').innerHTML = upHtml(ed.ups);
 				$('#edDocs').innerHTML = ed.docs.map((f, i) => chipHtml(f, 'rmcdoc', '', i)).join('');
 				// keep what the admin is typing: save the focused field's caret across the redraw
 				const act = document.activeElement, keep = act && act.closest && act.closest('#edMods') && act.dataset.m ? { f: act.dataset.fld, m: act.dataset.m, a: act.selectionStart } : null;
@@ -3186,8 +3212,8 @@
 				$('#admTime').value = r ? (r.duration || '') : '';
 				$('#admPub').checked = r ? r.published : true;
 				ed = {
-					cover: r ? (r.img || '') : '', docs: r && Array.isArray(r.docs) ? r.docs.map(d => ({ ...d })) : [],
-					mods: r ? (r.modules || []).map(m => ({ k: uid(), title: m.title || '', video_url: m.video_url || '', audio_url: m.audio_url || '', lesson: m.lesson || '', transcript: m.transcript || '', docs: Array.isArray(m.docs) ? m.docs.map(d => ({ ...d })) : [], links: Array.isArray(m.links) ? m.links.map(l => ({ ...l })) : [], linkOpen: false })) : [blankMod()]
+					ups: [], cvups: [], cover: r ? (r.img || '') : '', docs: r && Array.isArray(r.docs) ? r.docs.map(d => ({ ...d })) : [],
+					mods: r ? (r.modules || []).map(m => ({ ups: [], k: uid(), title: m.title || '', video_url: m.video_url || '', audio_url: m.audio_url || '', lesson: m.lesson || '', transcript: m.transcript || '', docs: Array.isArray(m.docs) ? m.docs.map(d => ({ ...d })) : [], links: Array.isArray(m.links) ? m.links.map(l => ({ ...l })) : [], linkOpen: false })) : [blankMod()]
 				};
 				const cl = $('#catList'); if (cl) cl.innerHTML = [...new Set(adminRows.map(x => x.cat).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
 				renderEditor();
@@ -3213,7 +3239,7 @@
 					rec = null; renderEditor();
 					const blob = new Blob(chunks, { type: mime });
 					if (blob.size < 500) return toast('Nothing was recorded. Try again.');
-					const f = await doUpload(blob, `voice-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${ext}`);
+					const f = await doUpload(blob, `voice-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${ext}`, (modOf(kk) || ed).ups);
 					const m = modOf(kk); if (f && m) { m.audio_url = f.url; renderEditor(); toast('Voice saved. Press Save course to publish it.'); }
 				};
 				mr.start(1000); renderEditor();
@@ -3228,11 +3254,11 @@
 				if (kind === 'cover') {
 					let blob = files[0], name = files[0].name;
 					try { blob = await resizeImage(files[0], 1200); name = 'cover.jpg'; } catch (e) { return toast('That is not a picture. Pick a JPG or PNG.'); }
-					const f = await doUpload(blob, name); if (f) { ed.cover = f.url; renderEditor(); }
+					const f = await doUpload(blob, name, ed.cvups); if (f) { ed.cover = f.url; renderEditor(); }
 					return;
 				}
 				for (const file of files) {
-					const f = await doUpload(file, file.name); if (!f) continue;
+					const f = await doUpload(file, file.name, m ? m.ups : ed.ups); if (!f) continue;
 					if (kind === 'video') { if (m) m.video_url = f.url; }
 					else if (kind === 'mdoc' && m) {
 						if (/^audio\//.test(file.type) && !m.audio_url) m.audio_url = f.url; else m.docs.push({ name: f.name, url: f.url, size: f.size });
@@ -3243,7 +3269,8 @@
 			function onEdClick(b) {
 				const a = b.dataset.ed, m = b.dataset.m ? modOf(b.dataset.m) : null, i = +b.dataset.i;
 				if (a === 'addmod') { ed.mods.push(blankMod()); renderEditor(); const t = $$('#edMods input[data-fld="mtitle"]').pop(); if (t) t.focus(); return; }
-				if (a === 'rmcdoc') ed.docs.splice(i, 1);
+				if (a === 'dismissup') { [ed.ups, ed.cvups, ...ed.mods.map(x => x.ups)].forEach(l => { const j = l.findIndex(x => x.id === b.dataset.u); if (j > -1) l.splice(j, 1); }); }
+				else if (a === 'rmcdoc') ed.docs.splice(i, 1);
 				else if (!m) return;
 				else if (a === 'rmmod') { if (rec && rec.k === m.k) return toast('Stop the recording first.'); if ((m.title || m.video_url || m.audio_url || m.lesson || m.docs.length) && !confirm('Delete this lesson?')) return; ed.mods.splice(ed.mods.indexOf(m), 1); if (!ed.mods.length) ed.mods.push(blankMod()); }
 				else if (a === 'up' || a === 'down') { const j = ed.mods.indexOf(m), t = a === 'up' ? j - 1 : j + 1; if (t < 0 || t >= ed.mods.length) return; ed.mods.splice(j, 1); ed.mods.splice(t, 0, m); }
