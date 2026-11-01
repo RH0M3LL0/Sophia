@@ -1587,11 +1587,11 @@
 		.up-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; position: relative; }
 		.up-btn input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; font-size: 0; }
 		.chips { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-		.chip { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--soft); min-width: 0; }
-		.chip > i { font-size: 20px; color: var(--primary); flex: none; }
-		.chip .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
-		.chip small { color: var(--muted); flex: none; }
-		.chip .x { border: 0; background: transparent; color: #dc2626; font-size: 20px; line-height: 1; padding: 4px 8px; cursor: pointer; flex: none; }
+		.fchip { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--soft); min-width: 0; }
+		.fchip > i { font-size: 20px; color: var(--primary); flex: none; }
+		.fchip .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+		.fchip small { color: var(--muted); flex: none; }
+		.fchip .x { border: 0; background: transparent; color: #dc2626; font-size: 20px; line-height: 1; padding: 4px 8px; cursor: pointer; flex: none; }
 		.ed-mod { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 14px; background: var(--surface); }
 		.ed-mod-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 		.ed-mod-top .no { font-weight: 700; color: var(--primary); flex: none; }
@@ -1619,8 +1619,8 @@
 		.up-ok > i, .up-err > i { font-size: 18px; flex: none; } .up-ok span, .up-err span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 		.up-ok button, .up-err button { border: 0; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
 		.up-run { border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px; margin: 8px 0; background: var(--soft); }
-		.chip.ok { border-color: #86efac; background: #f0fdf4; } .chip.ok .tick { color: #16a34a; font-size: 13px; flex: none; white-space: nowrap; }
-		@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .up-ok { background: #052e16; border-color: #166534; color: #bbf7d0; } :root:not([data-theme="light"]) .up-err { background: #450a0a; border-color: #991b1b; color: #fecaca; } :root:not([data-theme="light"]) .chip.ok { background: #052e16; border-color: #166534; } }
+		.fchip.ok { border-color: #86efac; background: #f0fdf4; } .fchip.ok .tick { color: #16a34a; font-size: 13px; flex: none; white-space: nowrap; }
+		@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .up-ok { background: #052e16; border-color: #166534; color: #bbf7d0; } :root:not([data-theme="light"]) .up-err { background: #450a0a; border-color: #991b1b; color: #fecaca; } :root:not([data-theme="light"]) .fchip.ok { background: #052e16; border-color: #166534; } }
 		.file-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; color: var(--text); text-decoration: none; background: var(--surface); }
 		.file-row i { font-size: 22px; color: var(--primary); flex: none; } .file-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; } .file-row small { color: var(--muted); }
 		.audio-panel audio { width: 100%; margin-top: 8px; }
@@ -2424,7 +2424,7 @@
 			/* Backend for the chatbot: POST {message, history} -> {reply}.
 			   Keep any AI API key on the server (e.g. a Supabase Edge Function). */
 			const FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
-			const TRANSCRIBE_ENDPOINT = FUNCTIONS_URL + '/transcribe';        //https://jctijixeslyimbqkucyb.supabase.co/functions/v1/transcribe
+			const TRANSCRIBE_ENDPOINT = FUNCTIONS_URL + '/transcribe';
 			const CHATBOT_ENDPOINT = FUNCTIONS_URL + '/chat';              // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/chat
 			const QUIZ_ENDPOINT = FUNCTIONS_URL + '/generate-quiz';        // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/generate-quiz
 			const PASS_MARK = 0.6;
@@ -3157,14 +3157,14 @@
 						const row = document.getElementById('u_' + u.id);
 						if (row) { row.querySelector('.bar > i').style.width = u.pct + '%'; row.querySelector('.pc').textContent = u.pct + '%'; }
 					});
-					u.state = 'ok'; toast('✓ Uploaded ' + name); setTimeout(() => { const i = owner.indexOf(u); if (i > -1) { owner.splice(i, 1); renderEditor(); } }, 12000);
+					u.state = 'ok'; toast('✓ Uploaded ' + name);
 					return f;
 				} catch (e) { u.state = 'err'; u.msg = e.message; toast(e.message, 6000); return null; }
 				finally { if (!--busy) { $('#admSave').disabled = false; $('#admSave').textContent = 'Save course'; } renderEditor(); }
 			}
 
 			function chipHtml(f, act, k, i) {
-				return `<div class="chip ok"><i class="bx ${fileIcon(f.name)}"></i><span class="nm">${esc(f.name)}</span>${f.size ? `<small>${fmtSize(f.size)}</small>` : ''}<span class="tick">✓ Uploaded</span><button class="x" type="button" data-ed="${act}" data-m="${k || ''}" data-i="${i}" aria-label="Remove">&times;</button></div>`;
+				return `<div class="fchip ok"><i class="bx ${fileIcon(f.name)}"></i><span class="nm">${esc(f.name)}</span>${f.size ? `<small>${fmtSize(f.size)}</small>` : ''}<span class="tick">✓ Uploaded</span><button class="x" type="button" data-ed="${act}" data-m="${k || ''}" data-i="${i}" aria-label="Remove">&times;</button></div>`;
 			}
 			function modHtml(m, n) {
 				const recHere = rec && rec.k === m.k, last = n === ed.mods.length - 1;
@@ -3174,8 +3174,8 @@
 						<button type="button" data-ed="up" data-m="${m.k}" ${n ? '' : 'disabled'} aria-label="Move up">&uarr;</button>
 						<button type="button" data-ed="down" data-m="${m.k}" ${last ? 'disabled' : ''} aria-label="Move down">&darr;</button>
 						<button type="button" data-ed="rmmod" data-m="${m.k}" aria-label="Delete lesson" style="color:#dc2626">&times;</button></div>
-					${m.video_url ? `<div class="chip ok"><i class="bx bx-video"></i><span class="nm">${esc(vname)}</span><span class="tick">✓ Added</span><button class="x" type="button" data-ed="rmvid" data-m="${m.k}" aria-label="Remove video">&times;</button></div>` : ''}
-					${m.audio_url ? `<audio controls preload="none" src="${esc(m.audio_url)}"></audio><div class="chip ok"><i class="bx bx-microphone"></i><span class="nm">Voice lesson</span><span class="tick">✓ Saved</span><button class="x" type="button" data-ed="rmaud" data-m="${m.k}" aria-label="Remove voice">&times;</button></div>` : ''}
+					${m.video_url ? `<div class="fchip ok"><i class="bx bx-video"></i><span class="nm">${esc(vname)}</span><span class="tick">✓ Added</span><button class="x" type="button" data-ed="rmvid" data-m="${m.k}" aria-label="Remove video">&times;</button></div>` : ''}
+					${m.audio_url ? `<audio controls preload="none" src="${esc(m.audio_url)}"></audio><div class="fchip ok"><i class="bx bx-microphone"></i><span class="nm">Voice lesson</span><span class="tick">✓ Saved</span><button class="x" type="button" data-ed="rmaud" data-m="${m.k}" aria-label="Remove voice">&times;</button></div>` : ''}
 					${recHere ? `<div class="rec-live"><i></i><span>Recording <b id="recTime">0:00</b></span><button class="btn btn-sm" type="button" data-ed="stoprec" style="margin-left:auto">Stop</button></div>` : ''}
 					<div class="media-btns">
 						<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-video-plus"></i> Upload video<input type="file" accept="video/*" data-f="video" data-m="${m.k}" hidden></label>
@@ -3186,7 +3186,7 @@
 					${upHtml(m.ups)}
 					${m.linkOpen ? `<div class="ed-row"><input data-fld="newlink" data-m="${m.k}" placeholder="YouTube, Vimeo, .mp4 or any web link" inputmode="url" autocomplete="off"><button class="btn btn-sm" type="button" data-ed="addlink" data-m="${m.k}">Add</button></div><small class="muted">YouTube, Vimeo and .mp4 links play in the lesson. Other links show as a reference link.</small>` : ''}
 					${m.docs.length ? `<div class="chips" style="margin-top:8px">${m.docs.map((f, i) => chipHtml(f, 'rmmdoc', m.k, i)).join('')}</div>` : ''}
-					${m.links.length ? `<div class="chips" style="margin-top:8px">${m.links.map((l, i) => `<div class="chip"><i class="bx bx-link"></i><span class="nm">${esc(l.label || l.url)}</span><button class="x" type="button" data-ed="rmlink" data-m="${m.k}" data-i="${i}" aria-label="Remove link">&times;</button></div>`).join('')}</div>` : ''}
+					${m.links.length ? `<div class="chips" style="margin-top:8px">${m.links.map((l, i) => `<div class="fchip"><i class="bx bx-link"></i><span class="nm">${esc(l.label || l.url)}</span><button class="x" type="button" data-ed="rmlink" data-m="${m.k}" data-i="${i}" aria-label="Remove link">&times;</button></div>`).join('')}</div>` : ''}
 					<label class="ed-lbl" for="n_${m.k}">Notes for students (optional)</label>
 					<textarea id="n_${m.k}" data-fld="lesson" data-m="${m.k}" placeholder="A short written summary or instructions">${esc(m.lesson)}</textarea>
 					<label class="ed-lbl" for="t_${m.k}">Transcript (students can read, listen and download it)</label>
