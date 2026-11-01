@@ -1335,6 +1335,9 @@
 			color: #166534;
 		}
 
+		:root[data-theme="dark"] .msg.ok { background: #14532d; color: #dcfce7; }
+		:root[data-theme="dark"] .msg.error { background: #7f1d1d; color: #fee2e2; }
+
 		.back-link {
 			display: block;
 			text-align: center;
@@ -3122,16 +3125,11 @@
 				route();            // show something immediately (landing page)
 				observeReveals();
 
-				if (!DEMO) {
-					try {
-						await loadSupabase();
-						sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-						sb.auth.onAuthStateChange(evt => {
-							if (evt === 'PASSWORD_RECOVERY') { setAuthMode('recovery'); location.hash = '#/login'; }
-							else refresh();
-						});
-					} catch (err) { toast('Could not reach the server. Showing the offline version.'); }
-				}
+				loadCache();                       // last known user + data, so a bad network never blanks the screen
+				state.ready = !!state.user;
+				paint(); route();
+				restoreUi();                       // drafts, chat, scroll position after a tab discard
+				await connectSupabase().catch(() => setOffline(true));   // listener ignores focus/token events
 				await Promise.all([loadCourses(), refresh()]);
 			}
 

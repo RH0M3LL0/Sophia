@@ -2,7 +2,7 @@
    - The page shell is served from cache first, then refreshed in the background,
      so a slow or dropped connection can never blank or reload the site.
    - Bump VERSION when you add files to PRECACHE. */
-const VERSION = 'v6';
+const VERSION = 'v4';
 const STATIC_CACHE = `edu-static-${VERSION}`;
 const IMAGE_CACHE = `edu-images-${VERSION}`;
 const CDN_CACHE = `edu-cdn-${VERSION}`;
@@ -13,6 +13,9 @@ const PRECACHE = [
   './index.html',
   './manifest.json',
   './images/students.png',
+  './images/about-page.jpg',
+  './images/icon-192.png',
+  './images/icon-512.png',
   './images/about-section-bg.png',
   './images/arts-and-crafts.png',
   './images/chemistry.png',
