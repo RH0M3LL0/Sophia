@@ -1922,6 +1922,20 @@
 		.chat-gate { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
 		.chat-gate i { font-size: 44px; color: var(--accent); }
 
+		/* loading screens */
+		.splash { position: fixed; inset: 0; z-index: 30000; display: grid; place-items: center; background: var(--bg); transition: opacity .35s, visibility .35s; }
+		.splash.done { opacity: 0; visibility: hidden; pointer-events: none; }
+		.splash-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 24px; }
+		.splash-inner .bx { font-size: 58px; color: var(--accent); }
+		.splash-inner strong { font-size: 26px; font-weight: 900; color: var(--primary); }
+		.splash-inner small { color: var(--muted); min-height: 20px; }
+		.spinner { width: 34px; height: 34px; border-radius: 50%; border: 4px solid var(--accent-soft); border-top-color: var(--accent); animation: spin .8s linear infinite; }
+		@keyframes spin { to { transform: rotate(360deg); } }
+		.skel { background: linear-gradient(90deg, var(--border) 25%, var(--soft) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; border-radius: 8px; }
+		@keyframes shimmer { to { background-position: -200% 0; } }
+		.btn.busy { pointer-events: none; opacity: .75; }
+		.btn.busy::after { content: ""; display: inline-block; width: 14px; height: 14px; margin-left: 8px; vertical-align: -2px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+
 		@media (max-width: 860px) {
 			body.app-mode .sidebar { display: none; }
 			body.app-mode .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--surface); border-top: 1px solid var(--border); z-index: 8000; }
@@ -1934,10 +1948,14 @@
 			body.app-mode .chat-win { bottom: calc(var(--tab-h) + 82px + env(safe-area-inset-bottom, 0px)); height: min(520px, calc(100dvh - var(--tab-h) - 120px)); }
 		}
 	</style>
-	<noscript><style>[data-reveal]:not(.in) { opacity: 1 !important; }</style></noscript>
+	<noscript><style>[data-reveal]:not(.in) { opacity: 1 !important; } .splash { display: none; }</style></noscript>
 </head>
 
 <body>
+
+	<div class="splash" id="splash" role="status" aria-live="polite">
+		<div class="splash-inner"><i class="bx bxs-graduation"></i><strong>Education</strong><div class="spinner"></div><small id="splashMsg">Getting everything ready…</small></div>
+	</div>
 
 	<!-- ======================= HEADER (shared by all views) ======================= -->
 	<header>
@@ -2615,6 +2633,8 @@
 				try { localStorage.setItem('themeMode', mode); } catch (e) { }
 			}
 			matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (getMode() === 'system') applyTheme('system'); });
+			let loadingData = true;
+			const skelRows = n => Array.from({ length: n }, () => '<div class="skel" style="height:54px;margin:10px 0"></div>').join('');
 			const closeMenu = () => { $('#nav').classList.remove('open'); $('#menuBtn').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false'); };
 			const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 			const displayName = u => (state.profile && state.profile.username) || (u && u.user_metadata && u.user_metadata.username) || ((u && u.email) || 'learner').split('@')[0];
@@ -2775,7 +2795,8 @@
 				} else cc.innerHTML = `<div class="continue"><div><small>Ready to learn?</small><h3>Pick your next course</h3></div><a class="btn" href="#/courses">Browse courses</a></div>`;
 
 				const mc = $('#myCourses'); mc.replaceChildren();
-				if (!state.enr.length) mc.append(el('p', { className: 'muted', textContent: 'You have not enrolled in any course yet.' }));
+				if (loadingData && !state.enr.length) mc.innerHTML = skelRows(2);
+				else if (!state.enr.length) mc.append(el('p', { className: 'muted', textContent: 'You have not enrolled in any course yet.' }));
 				state.enr.forEach(e => {
 					const c = COURSES[e.course_id]; if (!c) return;
 					const done = e.status === 'completed';
@@ -2786,7 +2807,8 @@
 				});
 
 				const mb = $('#myBookmarks'); mb.replaceChildren();
-				if (!state.bm.length) mb.append(el('p', { className: 'muted', textContent: 'No bookmarks yet. Tap the bookmark icon on a course.' }));
+				if (loadingData && !state.bm.length) mb.innerHTML = skelRows(1);
+				else if (!state.bm.length) mb.append(el('p', { className: 'muted', textContent: 'No bookmarks yet. Tap the bookmark icon on a course.' }));
 				state.bm.forEach(id => {
 					const c = COURSES[id]; if (!c) return;
 					const row = el('div', { className: 'row-item' });
@@ -2850,7 +2872,7 @@
 			/* --- course page: module list --- */
 			function renderCourse(id) {
 				const c = COURSES[id], box = $('#courseBox'), e = enrOf(id);
-				if (!c) { box.innerHTML = '<a class="back" href="#/courses"><i class="bx bx-arrow-back"></i> Courses</a><p class="muted">Course not found.</p>'; return; }
+				if (!c) { box.innerHTML = '<a class="back" href="#/courses"><i class="bx bx-arrow-back"></i> Courses</a>' + (loadingData ? skelRows(4) : '<p class="muted">Course not found.</p>'); return; }
 				if (e) prefetchQuiz(id, Math.min(e.modules_done, c.modules.length - 1));
 				let html = `<a class="back" href="#/courses"><i class="bx bx-arrow-back"></i> Courses</a><h2 class="heading" style="margin-bottom:6px">${esc(c.title)}</h2><p class="muted" style="margin-bottom:14px">${esc(c.cat)} · ${esc(c.time)}</p>`;
 				if (!e) html += `<div class="panel"><p style="margin-bottom:12px">Enroll to unlock the lessons and quizzes.</p><button class="btn" data-open="${esc(id)}">Enroll now</button></div>`;
@@ -2949,7 +2971,7 @@
 			const slug = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'course';
 
 			async function renderAdmin() {
-				const box = $('#adminList');
+				const box = $('#adminList'); box.innerHTML = skelRows(2);
 				if (!sb) { box.textContent = 'Admin needs Supabase to be configured.'; return; }
 				const { data, error } = await sb.from('courses').select('*').order('position');
 				if (error) { box.textContent = 'Could not load courses: ' + error.message; return; }
@@ -3084,7 +3106,7 @@
 				if (!c) return location.replace('#/courses');
 				if (!e || !(idx >= 0 && idx < c.modules.length) || idx > e.modules_done) return location.replace('#/course/' + id);
 				const back = `<a class="back" href="#/lesson/${esc(id)}/${idx}"><i class="bx bx-arrow-back"></i> Back to lesson</a>`;
-				box.innerHTML = back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2><p class="muted">Loading questions…</p>`;
+				box.innerHTML = back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2>${skelRows(4)}`;
 				const qs = await fetchQuestions(id, idx);
 				if (run !== quizRun || currentView !== 'quiz') return;
 				if (!qs || !qs.length) { box.innerHTML = back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2><div class="panel soon"><i class="bx bx-time-five"></i><h3>Quiz not ready yet</h3><p>Please check back soon.</p></div>`; return; }
@@ -3341,7 +3363,7 @@
 				if (authMode === 'otp' && !/^\d{6,10}$/.test($('#aCode').value.trim())) return authMessage('Enter the numeric code from your email.');
 				if (authMode !== 'forgot' && password.length < 8) return authMessage('Password must be at least 8 characters.');
 
-				btn.disabled = true; authMessage('');
+				btn.disabled = true; btn.classList.add('busy'); authMessage('');
 				try {
 					if (authMode === 'register') {
 						const { data, error } = await sb.auth.signUp({ email, password, options: { data: { phone }, emailRedirectTo: location.origin + location.pathname } });
@@ -3379,7 +3401,7 @@
 						setTimeout(() => { location.hash = '#/dashboard'; }, 1000);
 					}
 				} catch (err) { authMessage(err.message || 'Something went wrong.'); }
-				btn.disabled = false;
+				btn.disabled = false; btn.classList.remove('busy');
 			}
 
 			/* =================================================================
@@ -3549,8 +3571,18 @@
 				state.ready = !!state.user;
 				paint(); route();
 				restoreUi(); filterCourses($('#heroQuery').value);   // drafts, chat, scroll position after a tab discard
-				await connectSupabase().catch(() => setOffline(true));   // listener ignores focus/token events
-				await Promise.all([loadCourses(), refresh()]);
+				/* Hold the loading screen until session, courses and the hero image are ready,
+				   so nothing pops in piece by piece. On a bad network it gives up after 7s and shows saved data. */
+				const slowMsg = setTimeout(() => { const m = $('#splashMsg'); if (m) m.textContent = 'Slow connection… still loading'; }, 3500);
+				const heroImg = $('.hero-visual img');
+				const heroReady = new Promise(r => { if (!heroImg || heroImg.complete) return r(); heroImg.onload = heroImg.onerror = r; });
+				const dataReady = (async () => {
+					await connectSupabase().catch(() => setOffline(true));   // listener ignores focus/token events
+					await Promise.all([loadCourses(), refresh()]);
+				})().catch(() => { });
+				await Promise.race([Promise.all([dataReady, heroReady]), new Promise(r => setTimeout(r, 7000))]);
+				clearTimeout(slowMsg); loadingData = false; paint();
+				const sp = $('#splash'); if (sp) { sp.classList.add('done'); setTimeout(() => sp.remove(), 500); }
 			}
 
 			document.addEventListener('DOMContentLoaded', init);
