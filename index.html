@@ -13,8 +13,9 @@
 	<!-- Apply saved theme BEFORE first paint (prevents a light/dark flash) -->
 	<script>
 		try {
-			var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-			document.documentElement.setAttribute('data-theme', t);
+			var m = localStorage.getItem('themeMode') || 'system';
+			var d = m === 'dark' || (m === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+			document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
 		} catch (e) { }
 	</script>
 
@@ -500,7 +501,7 @@
 		}
 
 		.gradient-text {
-			background: linear-gradient(90deg, #2563eb, #7c3aed, #2563eb);
+			background: linear-gradient(90deg, #2563eb, #f97316, #2563eb);
 			background-size: 200% auto;
 			-webkit-background-clip: text;
 			background-clip: text;
@@ -1846,6 +1847,92 @@
 		html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
 			transition: background-color .3s ease, color .3s ease, border-color .3s ease, box-shadow .3s ease !important;
 		}
+
+		/* ================= v3: white / orange / blue theme, app layout ================= */
+		:root { --accent: #f97316; --accent-dark: #ea580c; --accent-soft: rgba(249,115,22,.12); --side-w: 250px; --tab-h: 64px; }
+		[data-theme="dark"] { --accent-soft: rgba(249,115,22,.2); }
+		.sub-title, .heading span, .accent { color: var(--accent); }
+		.btn:not(.btn-outline):not(.btn-danger) { background: var(--accent); }
+		.btn:not(.btn-outline):not(.btn-danger):hover { background: var(--accent-dark); }
+		.blob.b2 { background: #fdba74; }
+
+		/* animated hamburger (landing page only) */
+		.menu-toggle:hover { transform: none; }
+		.bars { position: relative; width: 20px; height: 14px; display: block; }
+		.bars i { position: absolute; left: 0; width: 100%; height: 2px; border-radius: 2px; background: currentColor; transition: transform .3s, opacity .2s, top .3s; }
+		.bars i:nth-child(1) { top: 0; } .bars i:nth-child(2) { top: 6px; } .bars i:nth-child(3) { top: 12px; }
+		.menu-toggle.open { border-color: var(--accent); color: var(--accent); }
+		.menu-toggle.open .bars i:nth-child(1) { top: 6px; transform: rotate(45deg); }
+		.menu-toggle.open .bars i:nth-child(2) { opacity: 0; transform: scaleX(0); }
+		.menu-toggle.open .bars i:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
+		/* app shell: sidebar on desktop, tab bar on phones */
+		.sidebar, .tabbar { display: none; }
+		body.app-mode > header { display: none; }
+		body.app-mode .net-banner { top: 0; }
+		body.app-mode .sidebar { display: flex; flex-direction: column; gap: 4px; position: fixed; inset: 0 auto 0 0; width: var(--side-w); padding: 20px 14px; background: var(--surface); border-right: 1px solid var(--border); z-index: 8000; }
+		body.app-mode .view.app.active { margin-left: var(--side-w); min-height: 100vh; background: var(--soft); }
+		.side-logo { display: flex; align-items: center; gap: 6px; font-size: 22px; font-weight: 900; color: var(--primary); text-decoration: none; padding: 4px 10px 18px; }
+		.side-logo .bx { font-size: 32px; color: var(--accent); }
+		.side-link { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border: 0; border-radius: 10px; background: none; text-decoration: none; font-size: 15px; font-weight: 500; color: var(--text); cursor: pointer; text-align: left; }
+		.side-link i { font-size: 21px; color: var(--muted); }
+		.side-link:hover { background: var(--soft); }
+		.side-link.on { background: var(--accent-soft); color: var(--accent-dark); }
+		[data-theme="dark"] .side-link.on { color: #fdba74; }
+		.side-link.on i { color: var(--accent); }
+		.side-spacer { flex: 1; }
+		.page { max-width: 1000px; margin: 0 auto; padding: 36px 24px 60px; }
+		.page-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 22px; }
+		.page .panel { margin-bottom: 22px; } .page .panel + .panel { margin-top: 0; }
+		.stat-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
+		.stat-card { display: flex; align-items: center; gap: 14px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+		.stat-card i { font-size: 26px; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; background: var(--accent-soft); color: var(--accent); }
+		.stat-card:nth-child(2) i { background: rgba(37,99,235,.12); color: var(--primary); }
+		.stat-card strong { display: block; font-size: 24px; line-height: 1.1; }
+		.stat-card span { font-size: 13px; color: var(--muted); }
+		.continue { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 24px; border-radius: var(--radius); margin-bottom: 22px; color: #fff; background: linear-gradient(135deg, #2563eb, #1e40af); box-shadow: var(--shadow-lg); }
+		.continue small { opacity: .85; } .continue h3 { font-size: 22px; margin: 4px 0 10px; }
+		.admin-card { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; border-left: 5px solid var(--accent); }
+		.admin-card > i { font-size: 34px; color: var(--accent); } .admin-card > div { flex: 1; min-width: 180px; }
+		.two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; } .two-col .panel { margin-bottom: 0; }
+		.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+		.ac { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+		.ac img { width: 100%; height: 140px; object-fit: contain; padding: 10px; background: var(--accent-soft); }
+		.ac-body { display: flex; flex-direction: column; gap: 8px; padding: 16px; flex: 1; } .ac-body small { color: var(--muted); }
+		.ac-body .actions-row { display: flex; gap: 8px; margin-top: auto; padding-top: 6px; }
+		.back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; color: var(--primary); font-weight: 500; text-decoration: none; }
+		.lesson-text { line-height: 1.75; } .lesson-text p { margin-bottom: 14px; }
+		.soon { text-align: center; padding: 40px 20px; color: var(--muted); } .soon i { display: block; font-size: 46px; color: var(--accent); margin-bottom: 8px; }
+		.step-row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+		.avatar { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-size: 38px; font-weight: 700; flex: none; }
+		.avatar img { width: 100%; height: 100%; object-fit: cover; }
+		.avatar-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; }
+		.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+		.seg button { padding: 10px 18px; border: 0; background: none; cursor: pointer; } .seg button.on { background: var(--primary); color: #fff; }
+		.set-row { display: flex; gap: 10px; flex-wrap: wrap; } .set-row input { flex: 1; min-width: 160px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+		.panel .field input { width: 100%; }
+
+		/* floating chatbot */
+		.chat-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 58px; height: 58px; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--accent); color: #fff; font-size: 28px; cursor: pointer; box-shadow: var(--shadow-lg); z-index: 9500; }
+		.chat-win { position: fixed; right: 18px; bottom: calc(88px + env(safe-area-inset-bottom, 0px)); width: min(380px, calc(100vw - 24px)); height: min(520px, calc(100dvh - 140px)); display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg); z-index: 9500; animation: viewIn .25s both; }
+		.chat-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: var(--primary); color: #fff; font-weight: 700; }
+		.chat-top button { background: none; border: 0; color: #fff; font-size: 24px; cursor: pointer; }
+		.chat-win .chat-log { flex: 1; height: auto; max-height: none; overflow-y: auto; padding: 14px; }
+		.chat-win .chat-form { padding: 10px; border-top: 1px solid var(--border); }
+		.chat-gate { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; }
+		.chat-gate i { font-size: 44px; color: var(--accent); }
+
+		@media (max-width: 860px) {
+			body.app-mode .sidebar { display: none; }
+			body.app-mode .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--surface); border-top: 1px solid var(--border); z-index: 8000; }
+			body.app-mode .view.app.active { margin-left: 0; padding-bottom: calc(var(--tab-h) + 10px); }
+			.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; text-decoration: none; color: var(--muted); }
+			.tab i { font-size: 22px; } .tab.on { color: var(--accent); }
+			.stat-cards, .two-col { grid-template-columns: 1fr; }
+			.page { padding: 22px 16px 40px; }
+			body.app-mode .chat-fab { bottom: calc(var(--tab-h) + 14px + env(safe-area-inset-bottom, 0px)); }
+			body.app-mode .chat-win { bottom: calc(var(--tab-h) + 82px + env(safe-area-inset-bottom, 0px)); height: min(520px, calc(100dvh - var(--tab-h) - 120px)); }
+		}
 	</style>
 	<noscript><style>[data-reveal]:not(.in) { opacity: 1 !important; }</style></noscript>
 </head>
@@ -1870,8 +1957,7 @@
 				<button class="icon-btn" id="themeBtn" aria-label="Toggle dark or light mode"><i
 						class="bx bx-moon"></i></button>
 				<a href="#/login" class="btn" id="authBtn">Login/Register</a>
-				<button class="icon-btn menu-toggle" id="menuBtn" aria-label="Open menu"><i
-						class="bx bx-menu"></i></button>
+				<button class="icon-btn menu-toggle" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span class="bars"><i></i><i></i><i></i></span></button>
 			</div>
 		</div>
 	</header>
@@ -2087,6 +2173,10 @@
 							<button type="button" class="eye" id="eyeBtn" aria-label="Show password"><i class="bx bx-show"></i></button>
 						</div>
 					</div>
+					<div class="field hidden" id="fAdminCode">
+						<label for="aAdmin">Admin code (optional)</label>
+						<input type="password" id="aAdmin" autocomplete="off" placeholder="Leave empty if you are a student">
+					</div>
 					<div class="forgot" id="fForgot"><a href="#" id="forgotLink">Forgot Password?</a></div>
 					<div class="forgot hidden" id="fResend"><a href="#" id="resendLink">Resend code</a></div>
 
@@ -2100,12 +2190,12 @@
 	</main>
 
 	<!-- ======================= VIEW 3: DASHBOARD ======================= -->
-	<main class="view" id="view-admin">
+	<main class="view app" id="view-admin">
 		<section class="dash">
 			<div class="container">
 				<p class="sub-title">Admin</p>
 				<h2 class="heading" style="margin:0 0 16px">Manage courses</h2>
-				<div id="adminList"><p class="muted">Loading\u2026</p></div>
+				<div id="adminList"><p class="muted">Loading…</p></div>
 				<form id="adminForm" class="admin-form">
 					<h3 id="adminFormTitle">Add a course</h3>
 					<div class="field"><label for="admTitle">Title</label><input id="admTitle" required maxlength="80" placeholder="e.g. Data Analysis"></div>
@@ -2113,8 +2203,8 @@
 				<div class="field"><label for="admTags">Tags (comma separated)</label><input id="admTags" placeholder="Excel, SQL"></div>
 					<div class="field"><label for="admImg">Image (file name in /images or a full https:// link)</label><input id="admImg" placeholder="tech.png"></div>
 					<div class="field"><label for="admTime">Total duration</label><input id="admTime" maxlength="30" placeholder="6hr 15 min"></div>
-					<div class="field"><label for="admModules">Modules: one per line, as <b>Title | video link</b></label>
-						<textarea id="admModules" required placeholder="Intro to Data | https://youtu.be/xxxxxxxxxxx&#10;Spreadsheets | https://vimeo.com/123456789&#10;Final Project"></textarea></div>
+					<div class="field"><label for="admModules">Modules: one per line, as <b>Title | video link | lesson text</b> (video and lesson are optional; use \n inside the lesson for a new paragraph)</label>
+						<textarea id="admModules" required placeholder="Intro to Data | https://youtu.be/xxxxxxxxxxx | Welcome to the course.\nSecond paragraph.&#10;Spreadsheets | https://vimeo.com/123456789&#10;Final Project"></textarea></div>
 					<label class="check"><input type="checkbox" id="admPub" checked> Published (visible to students)</label>
 					<div style="display:flex;gap:10px;flex-wrap:wrap">
 						<button class="btn" id="admSave" type="submit">Save course</button>
@@ -2125,45 +2215,100 @@
 		</section>
 	</main>
 
-	<main class="view" id="view-dashboard">
-		<section class="dash">
-			<div class="container">
-				<div class="dash-head">
-					<div>
-						<p class="sub-title">Dashboard</p>
-						<h2 class="heading" style="margin:0">Welcome, <span id="dashName">learner</span></h2>
-					</div>
-					<div style="display:flex;gap:10px;flex-wrap:wrap">
-						<button class="btn" id="certBtn" disabled title="Complete a course to unlock your certificate">
-							<i class="bx bx-download"></i> Download Certificate</button>
-						<button class="btn btn-outline" id="logoutBtn">Log out</button>
-					</div>
-				</div>
+<aside class="sidebar" id="sidebar" aria-label="App"></aside>
+	<div class="tabbar" id="tabbar" role="navigation" aria-label="App tabs"></div>
 
-				<div class="dash-grid">
-					<div>
-						<div class="panel"><h3>My Courses</h3><div id="myCourses"></div></div>
-						<div class="panel"><h3>Saved Bookmarks</h3><div id="myBookmarks"></div></div>
-					</div>
-					<div class="panel chat">
-						<h3>Study Assistant</h3>
-						<div class="chat-log" id="chatLog" aria-live="polite">
-							<div class="bubble bot">Hi! Ask me anything about your courses.</div>
-						</div>
-						<form class="chat-form" id="chatForm">
-							<input id="chatInput" placeholder="Type a question..." autocomplete="off" required>
-							<button class="btn btn-sm" type="submit">Send</button>
-						</form>
-					</div>
-				</div>
+	<!-- ======================= APP: DASHBOARD ======================= -->
+	<main class="view app" id="view-dashboard">
+		<div class="page">
+			<div class="page-head">
+				<div><p class="sub-title">Dashboard</p><h2 class="heading" style="margin:0">Welcome, <span id="dashName">learner</span></h2></div>
+				<button class="btn" id="certBtn" disabled title="Complete a course to unlock your certificate"><i class="bx bx-download"></i> Certificate</button>
 			</div>
-		</section>
+			<div class="stat-cards">
+				<div class="stat-card"><i class="bx bx-book-open"></i><div><strong id="stEnr">0</strong><span>Enrolled</span></div></div>
+				<div class="stat-card"><i class="bx bx-trophy"></i><div><strong id="stDone">0</strong><span>Completed</span></div></div>
+				<div class="stat-card"><i class="bx bx-line-chart"></i><div><strong id="stAvg">0%</strong><span>Average progress</span></div></div>
+			</div>
+			<div class="panel admin-card hidden" id="adminCard">
+				<i class="bx bx-shield-quarter"></i>
+				<div><h3 style="margin:0">Admin tools</h3><p class="muted">Add courses, write lessons and generate quizzes.</p></div>
+				<a class="btn" href="#/admin">Open admin</a>
+			</div>
+			<div id="continueCard"></div>
+			<div class="two-col">
+				<div class="panel"><h3>My Courses</h3><div id="myCourses"></div></div>
+				<div class="panel"><h3>Saved Bookmarks</h3><div id="myBookmarks"></div></div>
+			</div>
+		</div>
 	</main>
 
-	<!-- Shared course / quiz modal -->
-	<div class="overlay hidden" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+	<!-- ======================= APP: COURSES ======================= -->
+	<main class="view app" id="view-courses">
+		<div class="page">
+			<div class="page-head"><div><p class="sub-title">Courses</p><h2 class="heading" style="margin:0">Explore &amp; learn</h2></div></div>
+			<input type="search" id="appSearch" placeholder="Search courses..." aria-label="Search courses" style="width:100%;padding:14px;margin-bottom:18px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+			<div class="app-grid" id="appCourses"></div>
+		</div>
+	</main>
 
-	<!-- Offline / poor-connection notice (never reloads the page) -->
+	<!-- ======================= APP: COURSE / LESSON / QUIZ PAGES ======================= -->
+	<main class="view app" id="view-course"><div class="page" id="courseBox"></div></main>
+	<main class="view app" id="view-lesson"><div class="page" id="lessonBox"></div></main>
+	<main class="view app" id="view-quiz"><div class="page" id="quizBox"></div></main>
+
+	<!-- ======================= APP: PROFILE ======================= -->
+	<main class="view app" id="view-profile">
+		<div class="page">
+			<div class="page-head"><div><p class="sub-title">Profile</p><h2 class="heading" style="margin:0">Your account</h2></div></div>
+			<form class="panel" id="profileForm" novalidate>
+				<div class="avatar-row">
+					<div class="avatar" id="pAvatar">?</div>
+					<div><label class="btn btn-sm btn-outline" for="pPhoto" style="cursor:pointer">Change photo</label>
+						<input type="file" id="pPhoto" accept="image/*" hidden><p class="muted" style="font-size:13px;margin-top:6px">JPG or PNG. It is resized automatically.</p></div>
+				</div>
+				<div class="field"><label for="pName">Username</label><input id="pName" maxlength="30" autocomplete="nickname" placeholder="Your name"></div>
+				<div class="field"><label for="pPhone">Phone number</label><input id="pPhone" type="tel" autocomplete="tel" placeholder="+234 800 000 0000"></div>
+				<div class="field"><label for="pEmail">Email</label><input id="pEmail" type="email" autocomplete="email"></div>
+				<button class="btn" type="submit">Save changes</button>
+			</form>
+			<form class="panel" id="passForm" novalidate>
+				<h3>Change password</h3>
+				<div class="field"><label for="pPass">New password</label><input id="pPass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+				<div class="field"><label for="pPass2">Confirm new password</label><input id="pPass2" type="password" autocomplete="new-password"></div>
+				<button class="btn" type="submit">Update password</button>
+			</form>
+		</div>
+	</main>
+
+	<!-- ======================= APP: SETTINGS ======================= -->
+	<main class="view app" id="view-settings">
+		<div class="page">
+			<div class="page-head"><div><p class="sub-title">Settings</p><h2 class="heading" style="margin:0">Preferences</h2></div></div>
+			<div class="panel"><h3>Appearance</h3>
+				<div class="seg" id="themeSeg"><button type="button" data-tmode="light">Light</button><button type="button" data-tmode="dark">Dark</button><button type="button" data-tmode="system">System</button></div>
+			</div>
+			<div class="panel"><h3>Admin access</h3>
+				<p class="muted" id="adminState" style="margin-bottom:12px">Have an admin code? Enter it to unlock the admin tools.</p>
+				<form class="set-row" id="adminCodeForm"><input type="password" id="sAdminCode" autocomplete="off" placeholder="Admin code"><button class="btn" type="submit">Activate</button></form>
+			</div>
+			<div class="panel"><h3>Account</h3><button class="btn btn-outline" data-logout><i class="bx bx-log-out"></i> Log out</button></div>
+		</div>
+	</main>
+
+	<!-- Floating chatbot -->
+	<button class="chat-fab" id="chatFab" aria-label="Open study assistant"><i class="bx bx-message-rounded-dots"></i></button>
+	<section class="chat-win hidden" id="chatWin" aria-label="Study assistant">
+		<div class="chat-top"><span>Study Assistant</span><button id="chatClose" aria-label="Close chat">&times;</button></div>
+		<div class="chat-gate hidden" id="chatGate"><i class="bx bx-lock-alt"></i><p>Log in to chat with the study assistant.</p><a class="btn" href="#/login" id="chatLogin">Log in</a></div>
+		<div class="chat-log" id="chatLog" aria-live="polite"><div class="bubble bot">Hi! Ask me anything about your courses.</div></div>
+		<form class="chat-form" id="chatForm">
+			<input id="chatInput" placeholder="Type a question..." autocomplete="off" required>
+			<button class="btn btn-sm" type="submit">Send</button>
+		</form>
+	</section>
+
+		<!-- Offline / poor-connection notice (never reloads the page) -->
 	<div class="net-banner hidden" id="netBanner" role="status" aria-live="polite"></div>
 
 	<script>
@@ -2255,7 +2400,7 @@
 			   4. DATA LAYER: Supabase
 			   ================================================================= */
 			let sb = null, otpBusy = false;
-			const state = { user: null, enr: [], bm: [], ready: false, admin: false };
+			const state = { user: null, enr: [], bm: [], profile: {}, ready: false, admin: false };
 
 			const store = {
 				async user() {
@@ -2290,6 +2435,7 @@
 
 			async function refresh() {
 				await syncFromServer();
+				await claimPendingAdmin();
 				await checkAdmin();
 				state.ready = true;
 				paint();
@@ -2319,14 +2465,14 @@
 			/* --- last-known data, so the app opens instantly even with no network --- */
 			function saveCache() {
 				const u = state.user;
-				writeJSON(CACHE_KEY, { user: u ? { id: u.id, email: u.email, phone: u.phone } : null, enr: state.enr, bm: state.bm });
+				writeJSON(CACHE_KEY, { user: u ? { id: u.id, email: u.email, phone: u.phone, user_metadata: u.user_metadata || {} } : null, enr: state.enr, bm: state.bm, profile: state.profile });
 			}
 			function loadCache() {
 				const c = readJSON(CACHE_KEY, null);
-				if (c && c.user) { state.user = c.user; state.enr = c.enr || []; state.bm = c.bm || []; }
+				if (c && c.user) { state.user = c.user; state.enr = c.enr || []; state.bm = c.bm || []; state.profile = c.profile || {}; }
 			}
 			async function clearSession() {
-				state.admin = false; state.user = null; state.enr = []; state.bm = [];
+				state.admin = false; state.user = null; state.enr = []; state.bm = []; state.profile = {};
 				try { localStorage.removeItem(CACHE_KEY); localStorage.removeItem(QUEUE_KEY); } catch (e) { }
 				paint(); route();
 			}
@@ -2365,6 +2511,7 @@
 					state.user = user;
 					await queue.flush();
 					[state.enr, state.bm] = await withTimeout(Promise.all([store.enrollments(), store.bookmarks()]), 10000);
+					await loadProfile();
 					saveCache(); lastSync = Date.now(); setOffline(false);
 				} catch (err) {
 					setOffline(true);                                 // keep the cached data visible
@@ -2424,13 +2571,12 @@
 			   Phones throw background tabs away to free memory, which looks like
 			   a "refresh". We save where the user was and put them back.
 			   ================================================================= */
-			let openCourseId = null;
 
 			function saveUi() {
 				const val = id => { const n = document.getElementById(id); return n ? n.value : ''; };
 				try {
 					sessionStorage.setItem(UI_KEY, JSON.stringify({
-						hash: location.hash, scrollY: window.scrollY, course: openCourseId, chat: chatHistory.slice(-20),
+						hash: location.hash, scrollY: window.scrollY, chat: chatHistory.slice(-20),
 						drafts: { cName: val('cName'), cEmail: val('cEmail'), cCourse: val('cCourse'), cMsg: val('cMsg'), aEmail: val('aEmail'), aPhone: val('aPhone'), heroQuery: val('heroQuery') }
 					}));
 				} catch (e) { }
@@ -2443,7 +2589,6 @@
 				Object.entries(ui.drafts || {}).forEach(([id, v]) => { const n = document.getElementById(id); if (n && v) n.value = v; });
 				(ui.chat || []).forEach(m => { chatHistory.push(m); addBubble(m.content, m.role === 'user' ? 'me' : 'bot'); });
 				if (ui.hash === location.hash) requestAnimationFrame(() => window.scrollTo({ top: ui.scrollY || 0, behavior: 'instant' }));
-				if (ui.course && state.user && enrOf(ui.course)) openCourse(ui.course);
 			}
 
 			/* Load the Supabase library ONLY when configured  */
@@ -2457,36 +2602,61 @@
 			/* =================================================================
 			   5. THEME
 			   ================================================================= */
-			function applyTheme(t) {
+			const getMode = () => { try { return localStorage.getItem('themeMode') || 'system'; } catch (e) { return 'system'; } };
+			function applyTheme(mode) {
+				mode = mode || getMode();
+				const dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
 				const root = document.documentElement;
 				root.classList.add('theme-anim'); clearTimeout(applyTheme.timer); applyTheme.timer = setTimeout(() => root.classList.remove('theme-anim'), 450);
-				root.setAttribute('data-theme', t);
-				$('#themeBtn i').className = t === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
-				try { localStorage.setItem('theme', t); } catch (e) { }
+				root.setAttribute('data-theme', dark ? 'dark' : 'light');
+				$('#themeBtn i').className = dark ? 'bx bx-sun' : 'bx bx-moon';
+				$$('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.tmode === mode));
+				const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = dark ? '#0b1220' : '#2563eb';
+				try { localStorage.setItem('themeMode', mode); } catch (e) { }
 			}
+			matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (getMode() === 'system') applyTheme('system'); });
+			const closeMenu = () => { $('#nav').classList.remove('open'); $('#menuBtn').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false'); };
+			const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+			const displayName = u => (state.profile && state.profile.username) || (u && u.user_metadata && u.user_metadata.username) || ((u && u.email) || 'learner').split('@')[0];
 
 			/* =================================================================
 			   6. ROUTER (#/ = landing, #/login, #/dashboard)
 			   ================================================================= */
-			let currentView = '', pendingScroll = null, authMode = 'login';
+			const APP = ['dashboard', 'courses', 'course', 'lesson', 'quiz', 'profile', 'settings', 'admin'];
+			const TITLES = { home: 'Education | Learn. Grow. Succeed.', login: 'Login | Education', dashboard: 'Dashboard', courses: 'Courses', course: 'Course', lesson: 'Lesson', quiz: 'Quiz', profile: 'Profile', settings: 'Settings', admin: 'Admin' };
+			let currentView = '', currentSig = null, currentArgs = [], pendingScroll = null, authMode = 'login';
 
 			function route() {
-				const hash = location.hash.replace(/^#\/?/, '');
-				let name = ['login', 'dashboard', 'admin'].includes(hash) ? hash : 'home';
+				const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+				const head = parts[0] || '';
+				const name = head === 'login' ? 'login' : APP.includes(head) ? head : 'home';
+				const args = parts.slice(1).map(decodeURIComponent);
 
 				if (state.ready) {
-					if (name === 'dashboard' && !state.user) return location.replace('#/login');
-					if (name === 'admin' && !state.admin) return location.replace(state.user ? '#/dashboard' : '#/login');
+					if (APP.includes(name) && !state.user) return location.replace('#/login');
+					if (name === 'admin' && !state.admin) return location.replace('#/dashboard');
 					if (name === 'login' && state.user && authMode !== 'recovery' && authMode !== 'otp') return location.replace('#/dashboard');
 				}
-				if (name === currentView) return doScroll();
+				const sig = name + '|' + args.join('/') + '|' + !!state.user;
+				if (sig === currentSig) return doScroll();
+				currentSig = sig; currentArgs = args;
 
 				$$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
 				currentView = name;
+				document.body.classList.toggle('app-mode', APP.includes(name) && !!state.user);
+				$('#chatFab').classList.toggle('hidden', name === 'login');
+				if (name === 'login') $('#chatWin').classList.add('hidden');
 				if (name === 'admin') renderAdmin();
+				if (name === 'courses') renderAppCourses();
+				if (name === 'course') renderCourse(args[0]);
+				if (name === 'lesson') renderLesson(args[0], +args[1]);
+				if (name === 'quiz') renderQuiz(args[0], +args[1]);
+				if (name === 'profile') fillProfile();
+				if (name === 'settings') renderSettings();
+				renderNav();
 				if (name !== 'home') window.scrollTo(0, 0);
-				document.title = { home: 'Education | Learn. Grow. Succeed.', login: 'Login | Education', dashboard: 'Dashboard | Education', admin: 'Admin | Education' }[name];
-				$('#nav').classList.remove('open');
+				document.title = TITLES[name] + (name === 'home' || name === 'login' ? '' : ' | Education');
+				closeMenu();
 				observeReveals();
 				doScroll();
 			}
@@ -2546,17 +2716,20 @@
 				}));
 			}
 
-			/* Hero search: filter course cards by title / category */
+			/* Search: every word must appear in the title, category, tags or module names */
+			const courseMatches = (c, q) => {
+				c = c || {};
+				const hay = [c.title || '', c.cat || '', (c.tags || []).join(' '), (c.modules || []).join(' ')].join(' ').toLowerCase();
+				return q.toLowerCase().split(/\s+/).filter(Boolean).every(t => hay.includes(t));
+			};
 			function filterCourses(q) {
-				q = q.trim().toLowerCase();
 				let shown = 0;
 				$$('.course-card').forEach(c => {
-					const d = COURSES[c.dataset.course];
-					const hit = !q || (d.title + ' ' + d.cat + ' ' + d.tags.join(' ')).toLowerCase().includes(q);
+					const hit = courseMatches(COURSES[c.dataset.course], q);
 					c.classList.toggle('hidden', !hit); if (hit) shown++;
 				});
 				$('#noCourses')?.remove();
-				if (!shown) $('#courseGrid').appendChild(el('p', { className: 'empty-note', id: 'noCourses', textContent: 'No courses match your search.' }));
+				if (!shown) $('#courseGrid').appendChild(el('p', { className: 'empty-note', id: 'noCourses', textContent: 'No courses match \u201C' + q.trim() + '\u201D.' }));
 			}
 
 			/* =================================================================
@@ -2586,8 +2759,20 @@
 					$('.bookmark-btn i', card).className = saved ? 'bx bxs-bookmark' : 'bx bx-bookmark';
 				});
 
+				chatGate(); renderNav();
 				if (!u) return;
-				$('#dashName').textContent = (u.email || 'learner').split('@')[0];
+				$('#dashName').textContent = displayName(u);
+				$('#adminCard').classList.toggle('hidden', !state.admin);
+				const doneList = state.enr.filter(e => e.status === 'completed');
+				$('#stEnr').textContent = state.enr.length; $('#stDone').textContent = doneList.length;
+				$('#stAvg').textContent = (state.enr.length ? Math.round(state.enr.reduce((s, e) => s + (e.progress || 0), 0) / state.enr.length) : 0) + '%';
+
+				const active = state.enr.find(e => e.status !== 'completed' && COURSES[e.course_id]);
+				const cc = $('#continueCard');
+				if (active) {
+					const c = COURSES[active.course_id], n = Math.min(active.modules_done, c.modules.length - 1);
+					cc.innerHTML = `<div class="continue"><div><small>Continue learning</small><h3>${esc(c.title)}</h3><small>Module ${n + 1}: ${esc(c.modules[n])} · ${active.progress}%</small></div><a class="btn" href="#/lesson/${esc(active.course_id)}/${n}">Continue</a></div>`;
+				} else cc.innerHTML = `<div class="continue"><div><small>Ready to learn?</small><h3>Pick your next course</h3></div><a class="btn" href="#/courses">Browse courses</a></div>`;
 
 				const mc = $('#myCourses'); mc.replaceChildren();
 				if (!state.enr.length) mc.append(el('p', { className: 'muted', textContent: 'You have not enrolled in any course yet.' }));
@@ -2595,8 +2780,8 @@
 					const c = COURSES[e.course_id]; if (!c) return;
 					const done = e.status === 'completed';
 					const row = el('div', { className: 'row-item' });
-					row.innerHTML = `<div style="flex:1;min-width:160px"><strong>${c.title}</strong><br><small>${done ? 'Completed' : 'Module ' + Math.min(e.modules_done + 1, c.modules.length) + ' of ' + c.modules.length}</small><div class="bar"><i style="width:${e.progress}%"></i></div></div>
-						<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" data-open="${e.course_id}">${done ? 'Review' : 'Resume'}</button><button class="btn btn-sm btn-outline" data-cert="${e.course_id}" ${done ? '' : 'disabled'}>Certificate</button></div>`;
+					row.innerHTML = `<div style="flex:1;min-width:140px"><strong>${esc(c.title)}</strong><br><small>${done ? 'Completed' : 'Module ' + Math.min(e.modules_done + 1, c.modules.length) + ' of ' + c.modules.length}</small><div class="bar"><i style="width:${e.progress}%"></i></div></div>
+						<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm" data-go="#/course/${esc(e.course_id)}">${done ? 'Review' : 'Resume'}</button><button class="btn btn-sm btn-outline" data-cert="${esc(e.course_id)}" ${done ? '' : 'disabled'}>Certificate</button></div>`;
 					mc.append(row);
 				});
 
@@ -2605,13 +2790,14 @@
 				state.bm.forEach(id => {
 					const c = COURSES[id]; if (!c) return;
 					const row = el('div', { className: 'row-item' });
-					row.innerHTML = `<strong>${c.title}</strong><div style="display:flex;gap:8px"><button class="btn btn-sm" data-open="${id}">Open</button><button class="btn btn-sm btn-outline" data-unbm="${id}">Remove</button></div>`;
+					row.innerHTML = `<strong>${esc(c.title)}</strong><div style="display:flex;gap:8px"><button class="btn btn-sm" data-open="${esc(id)}">Open</button><button class="btn btn-sm btn-outline" data-unbm="${esc(id)}">Remove</button></div>`;
 					mb.append(row);
 				});
 
-				const done = state.enr.filter(e => e.status === 'completed');
-				$('#certBtn').disabled = !done.length;
-				$('#certBtn').dataset.cert = done.length ? done[done.length - 1].course_id : '';
+				$('#certBtn').disabled = !doneList.length;
+				$('#certBtn').dataset.cert = doneList.length ? doneList[doneList.length - 1].course_id : '';
+				if (currentView === 'courses') renderAppCourses();
+				if (currentView === 'course') renderCourse(currentArgs[0]);
 			}
 
 			/* =================================================================
@@ -2635,27 +2821,66 @@
 				openCourse(id);
 			}
 
-			function openOverlay(html) {
-				$('#modal').innerHTML = '<button class="close" aria-label="Close">&times;</button>' + html;
-				$('#overlay').classList.remove('hidden');
-				document.body.style.overflow = 'hidden';
-				$('#modal .close').onclick = closeOverlay;
-			}
-			function closeOverlay() { $('#modal').innerHTML = ''; $('#overlay').classList.add('hidden'); document.body.style.overflow = ''; openCourseId = null; }
+			const openCourse = id => { location.hash = '#/course/' + id; };
 
-			function openCourse(id) {
-				const c = COURSES[id], e = enrOf(id); if (!e) return;
-				openCourseId = id;
-				prefetchQuiz(id, Math.min(e.modules_done, c.modules.length - 1));
-				const next = Math.min(e.modules_done, c.modules.length - 1);
-				const banner = e.status === 'completed'
-					? `<div class="banner"><span>\uD83C\uDF89 You completed this course.</span><button class="btn btn-sm" data-cert="${id}">Download Certificate</button></div>`
-					: `<div class="banner"><span><strong>Resume learning:</strong> Module ${next + 1} \u00B7 ${c.modules[next]}</span><span class="mod-actions">${watchBtn(id, next)}<button class="btn btn-sm" data-quiz="${id}:${next}">Take module quiz</button></span></div>`;
-				const mods = c.modules.map((m, i) => {
-					const done = i < e.modules_done, cur = i === e.modules_done && e.status !== 'completed';
-					return `<div class="module ${done ? 'done' : ''} ${cur ? 'current' : ''}"><span>${done ? '\u2714' : i + 1 + '.'} ${m}</span><span class="mod-actions">${watchBtn(id, i)}<button class="btn btn-sm ${done ? 'btn-outline' : ''}" data-quiz="${id}:${i}" ${i > e.modules_done ? 'disabled' : ''}>${done ? 'Retake quiz' : 'Quiz'}</button></span></div>`;
-				}).join('');
-				openOverlay(`<h2>${c.title}</h2><div class="bar"><i style="width:${e.progress}%"></i></div>${banner}${mods}`);
+			/* --- sidebar (desktop) and tab bar (phones) --- */
+			function renderNav() {
+				const items = [['dashboard', 'bx-home-alt', 'Dashboard'], ['courses', 'bx-book-open', 'Courses'], ['profile', 'bx-user', 'Profile'], ['settings', 'bx-cog', 'Settings']];
+				if (state.admin) items.splice(3, 0, ['admin', 'bx-shield-quarter', 'Admin']);
+				const key = ['course', 'lesson', 'quiz'].includes(currentView) ? 'courses' : currentView;
+				const link = (cls, [id, ic, label]) => `<a class="${cls}${id === key ? ' on' : ''}" href="#/${id}"><i class="bx ${ic}"></i><span>${label}</span></a>`;
+				$('#sidebar').innerHTML = `<a class="side-logo" href="#/"><i class="bx bxs-graduation"></i> Education</a>` + items.map(i => link('side-link', i)).join('') +
+					`<span class="side-spacer"></span><a class="side-link" href="#/"><i class="bx bx-globe"></i><span>Website</span></a><button class="side-link" data-logout><i class="bx bx-log-out"></i><span>Log out</span></button>`;
+				$('#tabbar').innerHTML = items.map(i => link('tab', i)).join('');
+			}
+
+			/* --- courses page --- */
+			function renderAppCourses() {
+				const box = $('#appCourses');
+				const list = Object.entries(COURSES).filter(([, c]) => courseMatches(c, $('#appSearch').value));
+				if (!list.length) { box.replaceChildren(el('p', { className: 'muted', textContent: 'No courses match your search.' })); return; }
+				box.replaceChildren(...list.map(([id, c]) => {
+					const e = enrOf(id), saved = state.bm.includes(id), card = el('article', { className: 'ac' });
+					card.innerHTML = `<img src="${esc(imgSrc(c.img))}" alt="" loading="lazy"><div class="ac-body"><strong>${esc(c.title)}</strong><small>${esc(c.cat)} · ${esc(c.time)}</small>${e ? `<div class="bar"><i style="width:${e.progress}%"></i></div><small>${e.status === 'completed' ? 'Completed' : e.progress + '% done'}</small>` : ''}
+						<div class="actions-row"><button class="btn btn-sm" data-open="${esc(id)}" style="flex:1">${e ? (e.status === 'completed' ? 'Review' : 'Continue') : 'Enroll'}</button><button class="bookmark-btn${saved ? ' saved' : ''}" data-bm="${esc(id)}" aria-label="Bookmark"><i class="bx ${saved ? 'bxs-bookmark' : 'bx-bookmark'}"></i></button></div></div>`;
+					return card;
+				}));
+			}
+
+			/* --- course page: module list --- */
+			function renderCourse(id) {
+				const c = COURSES[id], box = $('#courseBox'), e = enrOf(id);
+				if (!c) { box.innerHTML = '<a class="back" href="#/courses"><i class="bx bx-arrow-back"></i> Courses</a><p class="muted">Course not found.</p>'; return; }
+				if (e) prefetchQuiz(id, Math.min(e.modules_done, c.modules.length - 1));
+				let html = `<a class="back" href="#/courses"><i class="bx bx-arrow-back"></i> Courses</a><h2 class="heading" style="margin-bottom:6px">${esc(c.title)}</h2><p class="muted" style="margin-bottom:14px">${esc(c.cat)} · ${esc(c.time)}</p>`;
+				if (!e) html += `<div class="panel"><p style="margin-bottom:12px">Enroll to unlock the lessons and quizzes.</p><button class="btn" data-open="${esc(id)}">Enroll now</button></div>`;
+				else {
+					html += `<div class="bar"><i style="width:${e.progress}%"></i></div>`;
+					if (e.status === 'completed') html += `<div class="banner"><span>🎉 You completed this course.</span><button class="btn btn-sm" data-cert="${esc(id)}">Download Certificate</button></div>`;
+					html += c.modules.map((m, i) => {
+						const done = i < e.modules_done, open = i <= e.modules_done;
+						return `<div class="module ${done ? 'done' : ''} ${i === e.modules_done && e.status !== 'completed' ? 'current' : ''}"><span>${done ? '✔' : open ? i + 1 + '.' : '🔒'} ${esc(m)}</span><span class="mod-actions"><button class="btn btn-sm ${done ? 'btn-outline' : ''}" data-go="#/lesson/${esc(id)}/${i}" ${open ? '' : 'disabled'}>${done ? 'Revisit' : 'Start'}</button></span></div>`;
+					}).join('');
+				}
+				box.innerHTML = html;
+			}
+
+			/* --- lesson page: video + text, then the quiz --- */
+			function renderLesson(id, i) {
+				const c = COURSES[id], e = enrOf(id), box = $('#lessonBox');
+				if (!c) return location.replace('#/courses');
+				if (!e || !(i >= 0 && i < c.modules.length) || i > e.modules_done) return location.replace('#/course/' + id);
+				prefetchQuiz(id, i);
+				const url = c.links && c.links[i], text = c.lessons && c.lessons[i], emb = url && toEmbed(url);
+				let media = '';
+				if (emb) media = emb.iframe
+					? `<div class="video-wrap"><iframe src="${emb.iframe}" title="Lesson video" allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
+					: `<div class="video-wrap"><video src="${esc(emb.video)}" controls playsinline preload="metadata"></video></div>`;
+				else if (url) media = `<p><a class="btn btn-sm btn-outline" href="${esc(url)}" target="_blank" rel="noopener">▶ Open video</a></p>`;
+				const body = text ? `<div class="panel lesson-text">${text.split(/\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('')}</div>` : '';
+				const soon = !url && !text ? `<div class="panel soon"><i class="bx bx-time-five"></i><h3>Lesson coming soon</h3><p>This lesson is being prepared. You can still take the quiz.</p></div>` : '';
+				box.innerHTML = `<a class="back" href="#/course/${esc(id)}"><i class="bx bx-arrow-back"></i> ${esc(c.title)}</a><p class="sub-title">Module ${i + 1} of ${c.modules.length}</p><h2 class="heading">${esc(c.modules[i])}</h2>${media}${body}${soon}
+					<div class="step-row">${i > 0 ? `<button class="btn btn-outline" data-go="#/lesson/${esc(id)}/${i - 1}">← Previous</button>` : '<span></span>'}<button class="btn" data-go="#/quiz/${esc(id)}/${i}">Take the quiz →</button></div>`;
 			}
 
 			/* =================================================================
@@ -2675,7 +2900,7 @@
 						title: r.title, cat: r.cat || '', tags: Array.isArray(r.tags) ? r.tags : [],
 						img: r.img || 'students.png', videos: r.videos || String(mods.length), views: r.views || '0',
 						time: r.duration || '', rating: r.rating || '5.0',
-						modules: mods.map(m => m.title), links: mods.map(m => m.video_url || '')
+						modules: mods.map(m => m.title), links: mods.map(m => m.video_url || ''), lessons: mods.map(m => m.lesson || '')
 					};
 				});
 				Object.keys(COURSES).forEach(k => delete COURSES[k]);
@@ -2691,7 +2916,7 @@
 					if (error || !data || !data.length) return;
 					writeJSON(COURSES_KEY, data);
 					applyCourses(data);
-					renderCourses(); observeReveals(); paint();
+					renderCourses(); filterCourses($('#heroQuery').value); observeReveals(); paint();
 				} catch (e) { /* keep what we have */ }
 			}
 
@@ -2711,22 +2936,6 @@
 				if (/\.(mp4|webm|ogg)$/i.test(u.pathname)) return { video: u.href };
 				return null;
 			}
-			function watchBtn(id, i) {
-				const c = COURSES[id];
-				return c && c.links && c.links[i] ? `<button class="btn btn-sm btn-outline" data-video="${id}:${i}">\u25B6 Watch</button>` : '';
-			}
-			function watchVideo(id, i) {
-				const c = COURSES[id], url = c && c.links && c.links[i], e = enrOf(id);
-				if (!url) return;
-				const emb = toEmbed(url);
-				if (!emb) { window.open(url, '_blank', 'noopener'); return; }   // any other site: open in a new tab
-				const player = emb.iframe
-					? `<div class="video-wrap"><iframe src="${emb.iframe}" title="Lesson video" allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
-					: `<div class="video-wrap"><video src="${emb.video}" controls playsinline preload="metadata"></video></div>`;
-				const canQuiz = e && i <= e.modules_done;
-				openOverlay(`<h2>${c.modules[i]}</h2>${player}${canQuiz ? `<div style="margin-top:14px"><button class="btn btn-sm" data-quiz="${id}:${i}">Take module quiz</button></div>` : ''}`);
-			}
-
 			/* --- admin --- */
 			async function checkAdmin() {
 				if (!sb || !state.user) { state.admin = false; return; }
@@ -2764,14 +2973,18 @@
 				$('#admTitle').value = r ? r.title : ''; $('#admCat').value = r ? r.cat : '';
 				$('#admTags').value = r ? (r.tags || []).join(', ') : ''; $('#admImg').value = r ? r.img : '';
 				$('#admTime').value = r ? r.duration : '';
-				$('#admModules').value = r ? (r.modules || []).map(m => m.video_url ? `${m.title} | ${m.video_url}` : m.title).join('\n') : '';
+				$('#admModules').value = r ? (r.modules || []).map(m => m.lesson ? `${m.title} | ${m.video_url || ''} | ${m.lesson.replace(/\n/g, '\\n')}` : m.video_url ? `${m.title} | ${m.video_url}` : m.title).join('\n') : '';
 				$('#admPub').checked = r ? r.published : true;
 			}
 
 			function parseModules(text) {
 				return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-					const m = l.match(/^(.*?)\s*\|\s*(https?:\/\/\S+)\s*$/);
-					return m ? { title: m[1], video_url: m[2] } : { title: l.replace(/\s*\|.*$/, '') };
+					const parts = l.split('|').map(s => s.trim()), m = { title: parts[0] };
+					let rest = parts.slice(1);
+					if (rest.length && (/^https?:\/\/\S+$/i.test(rest[0]) || rest[0] === '')) { if (rest[0]) m.video_url = rest[0]; rest.shift(); }
+					const lesson = rest.join(' | ').replace(/\\n/g, '\n').trim();
+					if (lesson) m.lesson = lesson;
+					return m;
 				});
 			}
 
@@ -2865,25 +3078,30 @@
 				catch (err) { return FALLBACK_QUIZ[id]; }
 			}
 
-			async function startQuiz(id, idx) {
-				const c = COURSES[id];
-				openOverlay(`<h2>${c.modules[idx]}: Quiz</h2><p class="muted">Loading questions\u2026</p>`);
+			let quizRun = 0;
+			async function renderQuiz(id, idx) {
+				const c = COURSES[id], e = enrOf(id), box = $('#quizBox'), run = ++quizRun;
+				if (!c) return location.replace('#/courses');
+				if (!e || !(idx >= 0 && idx < c.modules.length) || idx > e.modules_done) return location.replace('#/course/' + id);
+				const back = `<a class="back" href="#/lesson/${esc(id)}/${idx}"><i class="bx bx-arrow-back"></i> Back to lesson</a>`;
+				box.innerHTML = back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2><p class="muted">Loading questions…</p>`;
 				const qs = await fetchQuestions(id, idx);
-				if (!qs || !qs.length) { openOverlay(`<h2>${c.modules[idx]}: Quiz</h2><p class="muted">This quiz is not ready yet. Please check back soon.</p>`); return; }
+				if (run !== quizRun || currentView !== 'quiz') return;
+				if (!qs || !qs.length) { box.innerHTML = back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2><div class="panel soon"><i class="bx bx-time-five"></i><h3>Quiz not ready yet</h3><p>Please check back soon.</p></div>`; return; }
 
-				const form = el('form');
-				form.append(el('h2', { textContent: c.modules[idx] + ': Quiz' }), el('p', { className: 'muted', textContent: `Score ${PASS_MARK * 100}% or more to complete this module.` }));
+				const form = el('form', { className: 'panel' });
+				form.append(el('p', { className: 'muted', textContent: `Score ${PASS_MARK * 100}% or more to complete this module.` }));
 				qs.forEach((q, i) => {
-					const box = el('div', { className: 'q' }, el('p', { textContent: `${i + 1}. ${q.q}` }));
+					const qb = el('div', { className: 'q' }, el('p', { textContent: `${i + 1}. ${q.q}` }));
 					[...q.w, q.a].sort(() => Math.random() - .5).forEach(o => {
 						const radio = el('input', { type: 'radio', name: 'q' + i, value: o, required: true });
-						box.append(el('label', {}, radio, document.createTextNode(o)));
+						qb.append(el('label', {}, radio, document.createTextNode(o)));
 					});
-					form.append(box);
+					form.append(qb);
 				});
 				const submit = el('button', { className: 'btn', textContent: 'Submit answers' });
 				form.append(submit);
-				$('#modal').replaceChildren(el('button', { className: 'close', innerHTML: '&times;', onclick: closeOverlay }), form);
+				box.replaceChildren(); box.insertAdjacentHTML('beforeend', back + `<h2 class="heading">${esc(c.modules[idx])}: Quiz</h2>`); box.append(form);
 
 				form.onsubmit = async ev => {
 					ev.preventDefault();
@@ -2898,24 +3116,131 @@
 					});
 					const passed = score / qs.length >= PASS_MARK;
 					submit.remove();
-					form.append(el('div', { className: 'banner' },
-						el('span', { innerHTML: `<strong>${score}/${qs.length}</strong> ${passed ? 'Passed!' : 'Not yet. Review and try again.'}` }),
-						el('button', { className: 'btn btn-sm', textContent: 'Back to course', onclick: () => openCourse(id) })));
-
+					const msg = el('span', { innerHTML: `<strong>${score}/${qs.length}</strong> ${passed ? 'Passed! Saving…' : 'Not yet. Review the lesson and try again.'}` });
+					const actions = el('span', { className: 'mod-actions' });
+					form.append(el('div', { className: 'banner' }, msg, actions));
+					const btn = (label, fn, outline) => actions.append(el('button', { type: 'button', className: 'btn btn-sm' + (outline ? ' btn-outline' : ''), textContent: label, onclick: fn }));
 					try {
 						await store.logAttempt({ course_id: id, module_index: idx, score, total: qs.length, passed });
-						const e = enrOf(id);
-						if (passed && idx === e.modules_done) {
-							const done = e.modules_done + 1, total = c.modules.length;
-							const upd = { ...e, modules_done: done, last_module: Math.min(done, total - 1), progress: Math.round(done / total * 100) };
+						const cur = enrOf(id);
+						if (passed && idx === cur.modules_done) {
+							const done = cur.modules_done + 1, total = c.modules.length;
+							const upd = { ...cur, modules_done: done, last_module: Math.min(done, total - 1), progress: Math.round(done / total * 100) };
 							if (done >= total) { upd.status = 'completed'; upd.completed_at = new Date().toISOString(); }
 							delete upd.id;
 							await saveEnrollment(upd);
-							paint();
 							if (upd.status === 'completed') toast('Course completed! Certificate unlocked.');
 						}
 					} catch (err) { toast('Could not save progress: ' + err.message); }
+					msg.innerHTML = `<strong>${score}/${qs.length}</strong> ${passed ? 'Passed!' : 'Not yet. Review the lesson and try again.'}`;
+					if (passed) { idx + 1 < c.modules.length ? btn('Next lesson →', () => location.hash = `#/lesson/${id}/${idx + 1}`) : btn('Back to course', () => location.hash = '#/course/' + id); }
+					else { btn('Try again', () => renderQuiz(id, idx)); btn('Review lesson', () => location.hash = `#/lesson/${id}/${idx}`, true); }
+					paint();
 				};
+			}
+
+			/* =================================================================
+			   10b. PROFILE, SETTINGS, ADMIN CODE
+			   ================================================================= */
+			async function loadProfile() {
+				try {
+					const { data } = await sb.from('profiles').select('username,phone,avatar_url').eq('id', state.user.id).maybeSingle();
+					if (data) state.profile = data;
+				} catch (e) { /* keep cached profile */ }
+			}
+			function fillProfile() {
+				const u = state.user; if (!u) return;
+				const m = u.user_metadata || {}, p = state.profile || {};
+				$('#pName').value = p.username || m.username || ''; $('#pPhone').value = p.phone || m.phone || u.phone || ''; $('#pEmail').value = u.email || '';
+				const av = $('#pAvatar'), pic = p.avatar_url || m.avatar_url; av.replaceChildren();
+				if (pic) av.append(el('img', { src: pic, alt: 'Profile photo' })); else av.textContent = displayName(u)[0].toUpperCase();
+			}
+			async function saveProfile(ev) {
+				ev.preventDefault();
+				if (!sb || !state.user) return toast('You need to be online and logged in.');
+				const username = $('#pName').value.trim(), phone = $('#pPhone').value.trim(), email = $('#pEmail').value.trim();
+				if (phone && !/^\+?[0-9\s-]{7,15}$/.test(phone)) return toast('Enter a valid phone number.');
+				if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Enter a valid email address.');
+				try {
+					const { error } = await sb.from('profiles').upsert({ id: state.user.id, username: username || null, phone: phone || null, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+					if (error) throw error;
+					state.profile = { ...state.profile, username, phone };
+					const changed = email !== state.user.email;
+					if (changed) { const r = await sb.auth.updateUser({ email }); if (r.error) throw r.error; state.user = { ...state.user, ...r.data.user }; }
+					saveCache(); paint(); fillProfile();
+					toast(changed ? 'Saved. Check your new email to confirm the change.' : 'Profile saved.');
+				} catch (err) { toast('Could not save: ' + err.message); }
+			}
+			async function changePassword(ev) {
+				ev.preventDefault();
+				const p = $('#pPass').value;
+				if (p.length < 8) return toast('Password must be at least 8 characters.');
+				if (p !== $('#pPass2').value) return toast('The two passwords do not match.');
+				try {
+					const { error } = await sb.auth.updateUser({ password: p });
+					if (error) throw error;
+					ev.target.reset(); toast('Password updated.');
+				} catch (err) { toast('Could not update: ' + err.message); }
+			}
+			function resizeImage(file, max) {
+				return new Promise((res, rej) => {
+					const img = new Image(), url = URL.createObjectURL(file);
+					img.onload = () => {
+						const s = Math.min(1, max / Math.max(img.width, img.height)), cv = el('canvas', { width: Math.round(img.width * s), height: Math.round(img.height * s) });
+						cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url);
+						cv.toBlob(b => b ? res(b) : rej(new Error('Could not read image')), 'image/jpeg', .85);
+					};
+					img.onerror = () => rej(new Error('Not a valid image'));
+					img.src = url;
+				});
+			}
+			async function uploadAvatar(file) {
+				if (!file || !sb || !state.user) return;
+				try {
+					toast('Uploading photo…', 2500);
+					const blob = await resizeImage(file, 400), path = state.user.id + '/avatar.jpg';
+					const up = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+					if (up.error) throw up.error;
+					const url = sb.storage.from('avatars').getPublicUrl(path).data.publicUrl + '?v=' + Date.now();
+					const { error } = await sb.from('profiles').upsert({ id: state.user.id, avatar_url: url, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+					if (error) throw error;
+					state.profile = { ...state.profile, avatar_url: url }; saveCache(); fillProfile(); toast('Photo updated.');
+				} catch (err) { toast('Could not upload photo: ' + err.message); }
+			}
+			function renderSettings() {
+				$('#adminState').textContent = state.admin ? 'You have admin access. The Admin tab is unlocked.' : 'Have an admin code? Enter it to unlock the admin tools.';
+				$('#adminCodeForm').classList.toggle('hidden', state.admin);
+			}
+			async function claimAdmin(code) {
+				const { data, error } = await sb.rpc('redeem_admin_code', { code });
+				if (error) throw error;
+				return data || { ok: false, message: 'Invalid code.' };
+			}
+			async function claimPendingAdmin() {
+				const code = localStorage.getItem('edu_pending_admin');
+				if (!code || !sb || !state.user) return;
+				try {
+					const r = await claimAdmin(code);
+					if (!r.ok) toast('Admin code not accepted: ' + r.message);
+					localStorage.removeItem('edu_pending_admin');
+				} catch (err) { if (!isNetworkError(err)) localStorage.removeItem('edu_pending_admin'); }
+			}
+			async function submitAdminCode(ev) {
+				ev.preventDefault();
+				const code = $('#sAdminCode').value.trim(); if (!code) return;
+				if (!sb) return toast('You need to be online.');
+				try {
+					const r = await claimAdmin(code);
+					if (r.ok) { state.admin = true; $('#sAdminCode').value = ''; paint(); renderSettings(); toast(r.message); }
+					else toast(r.message);
+				} catch (err) { toast('Could not check the code: ' + err.message); }
+			}
+
+			/* --- floating chatbot --- */
+			function chatGate() {
+				const out = !state.user;
+				$('#chatGate').classList.toggle('hidden', !out);
+				$('#chatLog').classList.toggle('hidden', out); $('#chatForm').classList.toggle('hidden', out);
 			}
 
 			/* =================================================================
@@ -2932,7 +3257,7 @@
 				const line = (txt, y, font, color) => { x.font = font; x.fillStyle = color; x.fillText(txt, 700, y); };
 				line('Certificate of Completion', 220, 'bold 64px Roboto, sans-serif', '#2563eb');
 				line('This certifies that', 320, '28px Roboto, sans-serif', '#475569');
-				line((state.user.email || 'Learner').split('@')[0], 430, 'bold 72px Roboto, sans-serif', '#0f172a');
+				line(displayName(state.user), 430, 'bold 72px Roboto, sans-serif', '#0f172a');
 				line('has successfully completed the course', 520, '28px Roboto, sans-serif', '#475569');
 				line(c.title, 610, 'bold 54px Roboto, sans-serif', '#2563eb');
 				line('Issued ' + new Date(e.completed_at || Date.now()).toLocaleDateString(), 740, '24px Roboto, sans-serif', '#475569');
@@ -2992,7 +3317,7 @@
 				authMode = m;
 				const [title, sub, btn] = AUTH_COPY[m];
 				$('#authTitle').textContent = title; $('#authSub').textContent = sub; $('#authSubmit').textContent = btn;
-				$('#fPhone').classList.toggle('hidden', m !== 'register');
+				$('#fPhone').classList.toggle('hidden', m !== 'register'); $('#fAdminCode').classList.toggle('hidden', m !== 'register');
 				$('#fEmail').classList.toggle('hidden', m === 'recovery');
 				$('#fPass').classList.toggle('hidden', m === 'forgot');
 				$('#fCode').classList.toggle('hidden', m !== 'otp');
@@ -3021,6 +3346,9 @@
 					if (authMode === 'register') {
 						const { data, error } = await sb.auth.signUp({ email, password, options: { data: { phone }, emailRedirectTo: location.origin + location.pathname } });
 						if (error) throw error;
+						const adminCode = $('#aAdmin').value.trim();
+						if (adminCode) { try { localStorage.setItem('edu_pending_admin', adminCode); } catch (e) { } }
+						$('#aAdmin').value = '';
 						if (data.session) location.hash = '#/dashboard';
 						else authMessage('Account created. Check your email to confirm, then log in.', true);
 					} else if (authMode === 'login') {
@@ -3118,15 +3446,15 @@
 				const scrollLink = ev.target.closest('[data-scroll]');
 				if (scrollLink) {
 					pendingScroll = scrollLink.dataset.scroll;
-					$('#nav').classList.remove('open');
+					closeMenu();
 					if (currentView === 'home') { ev.preventDefault(); doScroll(); }
 					return; // otherwise the #/ href switches to home and route() scrolls
 				}
-				if (ev.target === $('#overlay')) return closeOverlay();
 
 				const t = ev.target.closest('button');
 				if (!t) return;
 				const card = t.closest('.course-card');
+				if (t.hasAttribute('data-logout') === false && t.id === 'menuBtn') return;
 
 				if (t.classList.contains('enroll-btn') && card) return enroll(card.dataset.course);
 				if (t.classList.contains('bookmark-btn') && card) {
@@ -3137,24 +3465,33 @@
 				}
 				if (t.dataset.open) return enroll(t.dataset.open);
 				if (t.dataset.unbm) { try { await toggleBookmark(t.dataset.unbm); } catch (e) { toast('Could not remove'); } return; }
-				if (t.dataset.video) { const [id, i] = t.dataset.video.split(':'); return watchVideo(id, +i); }
-				if (t.dataset.quiz) { const [id, i] = t.dataset.quiz.split(':'); return startQuiz(id, +i); }
+				if (t.dataset.go) { location.hash = t.dataset.go; return; }
+				if (t.dataset.tmode) return applyTheme(t.dataset.tmode);
+				if (t.dataset.bm) { try { await toggleBookmark(t.dataset.bm); } catch (e) { toast('Could not save bookmark'); } return; }
 				if (t.dataset.cert) return downloadCertificate(t.dataset.cert);
 				if (t.id === 'certBtn') return downloadCertificate(t.dataset.cert);
-				if (t.id === 'logoutBtn') { await store.logout(); await refresh(); toast('Logged out'); location.hash = '#/'; }
+				if (t.hasAttribute('data-logout')) { await store.logout(); await refresh(); toast('Logged out'); location.hash = '#/'; }
 			});
 
 			function bindStaticEvents() {
 				$('#themeBtn').onclick = () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-				$('#menuBtn').onclick = () => $('#nav').classList.toggle('open');
+				$('#profileForm').addEventListener('submit', saveProfile); $('#passForm').addEventListener('submit', changePassword);
+				$('#pPhoto').addEventListener('change', e => { uploadAvatar(e.target.files[0]); e.target.value = ''; });
+				$('#adminCodeForm').addEventListener('submit', submitAdminCode);
+				$('#chatFab').onclick = () => { const w = $('#chatWin'); w.classList.toggle('hidden'); chatGate(); if (!w.classList.contains('hidden') && state.user) $('#chatInput').focus(); };
+				$('#chatClose').onclick = () => $('#chatWin').classList.add('hidden');
+				$('#chatLogin').onclick = () => $('#chatWin').classList.add('hidden');
+				$('#menuBtn').onclick = () => { const o = $('#nav').classList.toggle('open'); $('#menuBtn').classList.toggle('open', o); $('#menuBtn').setAttribute('aria-expanded', String(o)); };
 				window.addEventListener('hashchange', route);
-				document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+				document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('#chatWin').classList.add('hidden'); closeMenu(); } });
 
 				$('#heroSearch').onsubmit = e => {
 					e.preventDefault(); filterCourses($('#heroQuery').value);
 					$('#sec-courses').scrollIntoView({ behavior: 'smooth' });
 				};
-				$('#heroQuery').addEventListener('input', e => { if (!e.target.value) filterCourses(''); });
+				let searchTimer;
+				$('#heroQuery').addEventListener('input', e => { clearTimeout(searchTimer); searchTimer = setTimeout(() => filterCourses(e.target.value), 120); });
+				$('#appSearch').addEventListener('input', renderAppCourses);
 
 				$('#contactForm').onsubmit = e => { e.preventDefault(); e.target.reset(); toast('Thanks! We will get back to you soon.'); };
 
@@ -3201,7 +3538,7 @@
 			   16. INIT
 			   ================================================================= */
 			async function init() {
-				applyTheme(document.documentElement.dataset.theme || 'light');
+				applyTheme();
 				applyCachedCourses();
 				renderFeatures(); renderCourses(); renderReviews();
 				bindStaticEvents(); initAdmin(); initCarousel(); setAuthMode('login');
@@ -3211,7 +3548,7 @@
 				loadCache();                       // last known user + data, so a bad network never blanks the screen
 				state.ready = !!state.user;
 				paint(); route();
-				restoreUi();                       // drafts, chat, scroll position after a tab discard
+				restoreUi(); filterCourses($('#heroQuery').value);   // drafts, chat, scroll position after a tab discard
 				await connectSupabase().catch(() => setOffline(true));   // listener ignores focus/token events
 				await Promise.all([loadCourses(), refresh()]);
 			}
