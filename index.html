@@ -2424,7 +2424,7 @@
 			/* Backend for the chatbot: POST {message, history} -> {reply}.
 			   Keep any AI API key on the server (e.g. a Supabase Edge Function). */
 			const FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
-			const TRANSCRIBE_ENDPOINT = FUNCTIONS_URL + '/transcribe';
+			const TRANSCRIBE_ENDPOINT = FUNCTIONS_URL + '/smooth-responder';        //https://jctijixeslyimbqkucyb.supabase.co/functions/v1/smooth-responder
 			const CHATBOT_ENDPOINT = FUNCTIONS_URL + '/chat';              // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/chat
 			const QUIZ_ENDPOINT = FUNCTIONS_URL + '/generate-quiz';        // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/generate-quiz
 			const PASS_MARK = 0.6;
