@@ -1,8 +1,11 @@
 /* Service worker: the app opens instantly and works offline.
    - The page shell is served from cache first, then refreshed in the background,
      so a slow or dropped connection can never blank or reload the site.
+   - Uploaded course files (video, audio, documents) are never cached here: they are
+     large, and the browser needs to stream them with range requests.
+   - A new version waits until the user taps "Update" in the app (no surprise reloads).
    - Bump VERSION when you add files to PRECACHE. */
-const VERSION = 'v9';
+const VERSION = 'v10';
 const STATIC_CACHE = `edu-static-${VERSION}`;
 const IMAGE_CACHE = `edu-images-${VERSION}`;
 const CDN_CACHE = `edu-cdn-${VERSION}`;
@@ -16,6 +19,7 @@ const PRECACHE = [
   './images/about-page.jpg',
   './images/icon-192.png',
   './images/icon-512.png',
+  './images/icon-maskable-512.png',
   './images/about-section-bg.png',
   './images/arts-and-crafts.png',
   './images/chemistry.png',
@@ -44,7 +48,8 @@ self.addEventListener('install', (event) => {
       ...PRECACHE.map((u) => shell.add(u).catch(() => null)),
       ...PRECACHE_CDN.map((u) => cdn.add(u).catch(() => null))
     ]);
-    await self.skipWaiting();
+    // no skipWaiting here: the page offers an Update button when a new version is ready
+    if (!self.registration.active) await self.skipWaiting();   // first install activates at once
   })());
 });
 
@@ -62,6 +67,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
+  if (req.headers.has('range')) return;                       // audio/video streaming goes straight to the network
   if (NETWORK_ONLY.some((h) => url.hostname.endsWith(h))) return;
 
   if (req.mode === 'navigate') return event.respondWith(handleNavigation(event));

@@ -1,13 +1,23 @@
 {
+  "id": "./index.html",
   "name": "Education - Online Learning",
   "short_name": "Education",
   "description": "Discover courses, develop skills and track your learning, even on slow networks.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#f8fafc",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#ffffff",
   "theme_color": "#2563eb",
+  "categories": [
+    "education"
+  ],
   "icons": [
     {
       "src": "images/icon-192.png",
@@ -22,7 +32,7 @@
       "purpose": "any"
     },
     {
-      "src": "images/icon-512.png",
+      "src": "images/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -31,7 +41,25 @@
   "shortcuts": [
     {
       "name": "My Dashboard",
-      "url": "./index.html#dashboard"
+      "short_name": "Dashboard",
+      "url": "./index.html#/dashboard",
+      "icons": [
+        {
+          "src": "images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Browse Courses",
+      "short_name": "Courses",
+      "url": "./index.html#/courses",
+      "icons": [
+        {
+          "src": "images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -8,6 +8,12 @@
 	<meta name="description" content="Practical online courses in design and web development. Learn at your own pace and earn a certificate.">
 	<meta name="theme-color" content="#2563eb">
 	<link rel="manifest" href="./manifest.json">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="Education">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<meta name="application-name" content="Education">
+	<link rel="icon" type="image/png" sizes="192x192" href="./images/icon-192.png">
 	<link rel="apple-touch-icon" href="./images/icon-192.png">
 
 	<!-- Apply saved theme BEFORE first paint (prevents a light/dark flash) -->
@@ -1569,6 +1575,51 @@
 			margin-bottom: 18px;
 		}
 
+		/* ---------- admin course builder ---------- */
+		.ed-step { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 700; margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--border); }
+		.ed-step:first-of-type { border-top: 0; margin-top: 6px; padding-top: 0; }
+		.ed-step small { font-weight: 400; color: var(--muted); font-size: 12px; flex-basis: 100%; margin-left: 32px; }
+		.ed-n { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: 13px; flex: none; }
+		.cover-box { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+		.cover-prev { width: 150px; aspect-ratio: 16/10; border-radius: 10px; border: 1px dashed var(--border); background: var(--soft); display: grid; place-items: center; color: var(--muted); font-size: 12px; overflow: hidden; flex: none; text-align: center; }
+		.cover-prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+		.cover-side { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+		.up-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; position: relative; }
+		.up-btn input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; font-size: 0; }
+		.chips { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+		.chip { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--soft); min-width: 0; }
+		.chip > i { font-size: 20px; color: var(--primary); flex: none; }
+		.chip .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+		.chip small { color: var(--muted); flex: none; }
+		.chip .x { border: 0; background: transparent; color: #dc2626; font-size: 20px; line-height: 1; padding: 4px 8px; cursor: pointer; flex: none; }
+		.ed-mod { border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 14px; background: var(--surface); }
+		.ed-mod-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+		.ed-mod-top .no { font-weight: 700; color: var(--primary); flex: none; }
+		.ed-mod-top input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
+		.ed-mod-top button { border: 1px solid var(--border); background: var(--soft); color: var(--text); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; flex: none; }
+		.ed-mod-top button:disabled { opacity: .35; cursor: default; }
+		.media-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 10px 0; }
+		.media-btns .btn { padding: 10px 8px; font-size: 13px; }
+		.ed-mod audio { width: 100%; margin: 4px 0 8px; }
+		.rec-live { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(220,38,38,.1); color: #dc2626; font-weight: 600; margin: 8px 0; }
+		.rec-live i { width: 10px; height: 10px; border-radius: 50%; background: #dc2626; animation: recPulse 1s infinite; }
+		@keyframes recPulse { 50% { opacity: .25; } }
+		.ed-row { display: flex; gap: 8px; margin: 8px 0; }
+		.ed-row input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
+		.ed-mod textarea { width: 100%; min-height: 80px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); margin-top: 6px; font: inherit; }
+		.ed-lbl { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 10px; }
+		.ed-more { margin: 16px 0; } .ed-more summary { cursor: pointer; font-weight: 600; margin-bottom: 12px; }
+		.up-list:empty { display: none; } .up-list { margin-bottom: 12px; }
+		.up-item { font-size: 13px; margin-bottom: 8px; } .up-item span { display: block; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.ed-bar { display: flex; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 calc(8px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+		.ed-bar .btn { flex: 1; min-width: 130px; }
+		.file-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; color: var(--text); text-decoration: none; background: var(--surface); }
+		.file-row i { font-size: 22px; color: var(--primary); flex: none; } .file-row span { flex: 1; min-width: 0; overflow-wrap: anywhere; } .file-row small { color: var(--muted); }
+		.audio-panel audio { width: 100%; margin-top: 8px; }
+		.install-hint { font-size: 14px; }
+		.update-bar { position: fixed; left: 12px; right: 12px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--text); color: var(--bg); padding: 12px 14px; border-radius: 12px; box-shadow: var(--shadow-lg); max-width: 520px; margin: 0 auto; }
+		.update-bar .btn { padding: 8px 14px; }
+
 		.btn-danger {
 			background: transparent;
 			color: #dc2626;
@@ -1940,6 +1991,7 @@
 			body.app-mode .sidebar { display: none; }
 			body.app-mode .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--surface); border-top: 1px solid var(--border); z-index: 8000; }
 			body.app-mode .view.app.active { margin-left: 0; padding-bottom: calc(var(--tab-h) + 10px); }
+			body.app-mode .ed-bar { bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); }
 			.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; text-decoration: none; color: var(--muted); }
 			.tab i { font-size: 22px; } .tab.on { color: var(--accent); }
 			.stat-cards, .two-col { grid-template-columns: 1fr; }
@@ -2214,17 +2266,35 @@
 				<p class="sub-title">Admin</p>
 				<h2 class="heading" style="margin:0 0 16px">Manage courses</h2>
 				<div id="adminList"><p class="muted">Loading…</p></div>
-				<form id="adminForm" class="admin-form">
+				<form id="adminForm" class="admin-form" novalidate>
 					<h3 id="adminFormTitle">Add a course</h3>
-					<div class="field"><label for="admTitle">Title</label><input id="admTitle" required maxlength="80" placeholder="e.g. Data Analysis"></div>
-					<div class="field"><label for="admCat">Category</label><input id="admCat" maxlength="60" placeholder="e.g. Tech Courses"></div>
-				<div class="field"><label for="admTags">Tags (comma separated)</label><input id="admTags" placeholder="Excel, SQL"></div>
-					<div class="field"><label for="admImg">Image (file name in /images or a full https:// link)</label><input id="admImg" placeholder="tech.png"></div>
-					<div class="field"><label for="admTime">Total duration</label><input id="admTime" maxlength="30" placeholder="6hr 15 min"></div>
-					<div class="field"><label for="admModules">Modules: one per line, as <b>Title | video link | lesson text</b> (video and lesson are optional; use \n inside the lesson for a new paragraph)</label>
-						<textarea id="admModules" required placeholder="Intro to Data | https://youtu.be/xxxxxxxxxxx | Welcome to the course.\nSecond paragraph.&#10;Spreadsheets | https://vimeo.com/123456789&#10;Final Project"></textarea></div>
+
+					<div class="ed-step"><span class="ed-n">1</span> Course details</div>
+					<div class="field"><label for="admTitle">Title</label><input id="admTitle" maxlength="80" placeholder="e.g. Data Analysis" autocomplete="off"></div>
+					<div class="field"><label for="admCat">Category</label><input id="admCat" maxlength="60" placeholder="e.g. Tech Courses" list="catList" autocomplete="off"><datalist id="catList"></datalist></div>
+					<div class="field"><label>Cover image</label>
+						<div class="cover-box"><div class="cover-prev" id="cvPrev"></div>
+							<div class="cover-side">
+								<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-image-add"></i> Upload cover<input type="file" accept="image/*" data-f="cover" hidden></label>
+								<input id="admImg" data-fld="cover" placeholder="or paste an image link" autocomplete="off" inputmode="url">
+							</div></div></div>
+
+					<div class="ed-step"><span class="ed-n">2</span> Course documents <small>PDF, Word, slides, sheets, any file</small></div>
+					<div class="chips" id="edDocs"></div>
+					<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-upload"></i> Upload documents<input type="file" multiple data-f="cdoc" hidden></label>
+
+					<div class="ed-step"><span class="ed-n">3</span> Lessons <small>Each lesson can have a video, a voice note, links and files</small></div>
+					<div id="edMods"></div>
+					<button class="btn btn-outline" type="button" data-ed="addmod" style="width:100%;margin-bottom:6px"><i class="bx bx-plus"></i> Add a lesson</button>
+
+					<details class="ed-more"><summary>More options</summary>
+						<div class="field"><label for="admTime">Total duration</label><input id="admTime" maxlength="30" placeholder="6hr 15 min"></div>
+						<div class="field"><label for="admTags">Tags (comma separated)</label><input id="admTags" placeholder="Excel, SQL"></div>
+					</details>
+
 					<label class="check"><input type="checkbox" id="admPub" checked> Published (visible to students)</label>
-					<div style="display:flex;gap:10px;flex-wrap:wrap">
+					<div id="upList" class="up-list" aria-live="polite"></div>
+					<div class="ed-bar">
 						<button class="btn" id="admSave" type="submit">Save course</button>
 						<button class="btn btn-outline" id="admReset" type="button">Clear form</button>
 					</div>
@@ -2305,6 +2375,10 @@
 			<div class="page-head"><div><p class="sub-title">Settings</p><h2 class="heading" style="margin:0">Preferences</h2></div></div>
 			<div class="panel"><h3>Appearance</h3>
 				<div class="seg" id="themeSeg"><button type="button" data-tmode="light">Light</button><button type="button" data-tmode="dark">Dark</button><button type="button" data-tmode="system">System</button></div>
+			</div>
+			<div class="panel hidden" id="installPanel"><h3>Install the app</h3>
+				<p class="muted install-hint" id="installText" style="margin-bottom:12px">Add Education to your home screen. It opens full screen and works offline.</p>
+				<button class="btn" id="installBtn" type="button"><i class="bx bx-download"></i> Install</button>
 			</div>
 			<div class="panel"><h3>Admin access</h3>
 				<p class="muted" id="adminState" style="margin-bottom:12px">Have an admin code? Enter it to unlock the admin tools.</p>
@@ -2878,6 +2952,7 @@
 				if (!e) html += `<div class="panel"><p style="margin-bottom:12px">Enroll to unlock the lessons and quizzes.</p><button class="btn" data-open="${esc(id)}">Enroll now</button></div>`;
 				else {
 					html += `<div class="bar"><i style="width:${e.progress}%"></i></div>`;
+						if (c.docs && c.docs.length) html += `<div class="panel" style="margin-top:14px"><h3 style="margin-bottom:10px">Course files</h3>${fileRows(c.docs)}</div>`;
 					if (e.status === 'completed') html += `<div class="banner"><span>🎉 You completed this course.</span><button class="btn btn-sm" data-cert="${esc(id)}">Download Certificate</button></div>`;
 					html += c.modules.map((m, i) => {
 						const done = i < e.modules_done, open = i <= e.modules_done;
@@ -2887,7 +2962,9 @@
 				box.innerHTML = html;
 			}
 
-			/* --- lesson page: video + text, then the quiz --- */
+			const fileRows = list => list.filter(f => httpUrl(f.url)).map(f => `<a class="file-row" href="${esc(f.url)}" target="_blank" rel="noopener"><i class="bx ${fileIcon(f.name)}"></i><span>${esc(f.name)}${f.size ? ` <small>${fmtSize(f.size)}</small>` : ''}</span><i class="bx bx-download" style="font-size:18px"></i></a>`).join('');
+
+				/* --- lesson page: video, voice, text, files, then the quiz --- */
 			function renderLesson(id, i) {
 				const c = COURSES[id], e = enrOf(id), box = $('#lessonBox');
 				if (!c) return location.replace('#/courses');
@@ -2900,8 +2977,12 @@
 					: `<div class="video-wrap"><video src="${esc(emb.video)}" controls playsinline preload="metadata"></video></div>`;
 				else if (url) media = `<p><a class="btn btn-sm btn-outline" href="${esc(url)}" target="_blank" rel="noopener">▶ Open video</a></p>`;
 				const body = text ? `<div class="panel lesson-text">${text.split(/\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('')}</div>` : '';
-				const soon = !url && !text ? `<div class="panel soon"><i class="bx bx-time-five"></i><h3>Lesson coming soon</h3><p>This lesson is being prepared. You can still take the quiz.</p></div>` : '';
-				box.innerHTML = `<a class="back" href="#/course/${esc(id)}"><i class="bx bx-arrow-back"></i> ${esc(c.title)}</a><p class="sub-title">Module ${i + 1} of ${c.modules.length}</p><h2 class="heading">${esc(c.modules[i])}</h2>${media}${body}${soon}
+				const aud = c.audios && httpUrl(c.audios[i]), mdocs = (c.mdocs && c.mdocs[i]) || [], mlinks = (c.mlinks && c.mlinks[i]) || [];
+					const audio = aud ? `<div class="panel audio-panel"><strong><i class="bx bx-headphone"></i> Listen to this lesson</strong><audio controls preload="none" src="${esc(aud)}"></audio></div>` : '';
+					const files = mdocs.length ? `<div class="panel"><h3 style="margin-bottom:10px">Lesson files</h3>${fileRows(mdocs)}</div>` : '';
+					const refs = mlinks.length ? `<div class="panel"><h3 style="margin-bottom:10px">Useful links</h3>${mlinks.filter(l => httpUrl(l.url)).map(l => `<a class="file-row" href="${esc(l.url)}" target="_blank" rel="noopener"><i class="bx bx-link-external"></i><span>${esc(l.label || l.url)}</span></a>`).join('')}</div>` : '';
+					const soon = !url && !text && !aud && !mdocs.length && !mlinks.length ? `<div class="panel soon"><i class="bx bx-time-five"></i><h3>Lesson coming soon</h3><p>This lesson is being prepared. You can still take the quiz.</p></div>` : '';
+				box.innerHTML = `<a class="back" href="#/course/${esc(id)}"><i class="bx bx-arrow-back"></i> ${esc(c.title)}</a><p class="sub-title">Module ${i + 1} of ${c.modules.length}</p><h2 class="heading">${esc(c.modules[i])}</h2>${media}${audio}${body}${files}${refs}${soon}
 					<div class="step-row">${i > 0 ? `<button class="btn btn-outline" data-go="#/lesson/${esc(id)}/${i - 1}">← Previous</button>` : '<span></span>'}<button class="btn" data-go="#/quiz/${esc(id)}/${i}">Take the quiz →</button></div>`;
 			}
 
@@ -2922,7 +3003,9 @@
 						title: r.title, cat: r.cat || '', tags: Array.isArray(r.tags) ? r.tags : [],
 						img: r.img || 'students.png', videos: r.videos || String(mods.length), views: r.views || '0',
 						time: r.duration || '', rating: r.rating || '5.0',
-						modules: mods.map(m => m.title), links: mods.map(m => m.video_url || ''), lessons: mods.map(m => m.lesson || '')
+						modules: mods.map(m => m.title), links: mods.map(m => m.video_url || ''), lessons: mods.map(m => m.lesson || ''),
+						audios: mods.map(m => m.audio_url || ''), mdocs: mods.map(m => Array.isArray(m.docs) ? m.docs : []), mlinks: mods.map(m => Array.isArray(m.links) ? m.links : []),
+						docs: Array.isArray(r.docs) ? r.docs : []
 					};
 				});
 				Object.keys(COURSES).forEach(k => delete COURSES[k]);
@@ -2976,10 +3059,11 @@
 				const { data, error } = await sb.from('courses').select('*').order('position');
 				if (error) { box.textContent = 'Could not load courses: ' + error.message; return; }
 				adminRows = data || [];
+					const cl = $('#catList'); if (cl) cl.innerHTML = [...new Set(adminRows.map(x => x.cat).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
 				box.replaceChildren(...adminRows.map(r => {
-					const n = (r.modules || []).length, v = (r.modules || []).filter(m => m.video_url).length;
+					const ms = r.modules || [], n = ms.length, v = ms.filter(m => m.video_url).length, au = ms.filter(m => m.audio_url).length, fl = (Array.isArray(r.docs) ? r.docs.length : 0) + ms.reduce((t, m) => t + (m.docs ? m.docs.length : 0), 0);
 					const row = el('div', { className: 'admin-row' });
-					const info = el('div', {}, el('strong', { textContent: r.title }), el('small', { textContent: `${n} modules \u00B7 ${v} with video \u00B7 ${r.published ? 'Live' : 'Draft'}` }));
+					const info = el('div', {}, el('strong', { textContent: r.title }), el('small', { textContent: `${n} lessons \u00B7 ${v} video \u00B7 ${au} voice \u00B7 ${fl} files \u00B7 ${r.published ? 'Live' : 'Draft'}` }));
 					const acts = el('div', { className: 'mod-actions' });
 					[['edit', 'Edit', 'btn btn-sm'], ['quiz', 'Generate quiz', 'btn btn-sm btn-outline'], ['del', 'Delete', 'btn btn-sm btn-danger']].forEach(([a, label, cls]) => {
 						const b = el('button', { className: cls, textContent: label, type: 'button' }); b.dataset.adm = a; b.dataset.id = r.id; acts.append(b);
@@ -2989,45 +3073,224 @@
 				if (!adminRows.length) box.textContent = 'No courses yet. Add one below.';
 			}
 
+			/* ---------- course builder ----------
+			   ed = the course being edited. Text fields sync into it as you type; buttons that change
+			   the structure (add/remove/upload) redraw the lesson cards. */
+			const BUCKET = 'course-files', MAX_UPLOAD = 50 * 1024 * 1024;
+			let ed = { cover: '', docs: [], mods: [] }, busy = 0, rec = null;
+			const uid = () => Math.random().toString(36).slice(2, 8);
+			const blankMod = () => ({ k: uid(), title: '', video_url: '', audio_url: '', lesson: '', docs: [], links: [], linkOpen: false });
+			const safeName = n => (String(n).normalize('NFKD').replace(/[^\w.\-]+/g, '_').replace(/^_+|_+$/g, '').slice(-80)) || 'file';
+			const fmtSize = b => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
+			const httpUrl = u => /^https?:\/\/\S+$/i.test(u || '') ? u : '';
+			const fileIcon = n => { n = (n || '').toLowerCase(); return /\.pdf$/.test(n) ? 'bxs-file-pdf' : /\.(docx?|rtf|odt)$/.test(n) ? 'bxs-file-doc' : /\.(png|jpe?g|gif|webp|svg)$/.test(n) ? 'bxs-file-image' : /\.(zip|rar|7z)$/.test(n) ? 'bxs-file-archive' : /\.(mp3|m4a|wav|ogg|webm)$/.test(n) ? 'bxs-music' : /\.(mp4|mov|mkv)$/.test(n) ? 'bxs-videos' : 'bxs-file'; };
+			const modOf = k => ed.mods.find(m => m.k === k);
+
+			/* upload one file to the "course-files" bucket, with a progress bar */
+			function uploadFile(file, name, onProgress) {
+				return (async () => {
+					if (!sb) throw new Error('Not connected. Try again in a moment.');
+					if (file.size > MAX_UPLOAD) throw new Error(`"${name}" is ${fmtSize(file.size)}. Uploads can be up to 50 MB. For a bigger video, put it on YouTube or Vimeo and use "Paste link".`);
+					const { data } = await sb.auth.getSession();
+					const token = data.session && data.session.access_token;
+					if (!token) throw new Error('Please log in again.');
+					const path = `${new Date().toISOString().slice(0, 7)}/${uid()}-${safeName(name)}`;
+					await new Promise((res, rej) => {
+						const x = new XMLHttpRequest();
+						x.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`);
+						x.setRequestHeader('apikey', SUPABASE_ANON_KEY);
+						x.setRequestHeader('Authorization', 'Bearer ' + token);
+						x.setRequestHeader('x-upsert', 'false');
+						x.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+						x.timeout = 10 * 60 * 1000;
+						x.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+						x.onload = () => {
+							if (x.status >= 200 && x.status < 300) return res();
+							let msg = ''; try { msg = JSON.parse(x.responseText).message || ''; } catch (e) { /* not JSON */ }
+							if (/bucket not found/i.test(msg)) msg = 'The upload folder is not set up yet. Run upgrade_v4.sql in Supabase first.';
+							else if (x.status === 401 || x.status === 403 || /row-level|policy|unauthor/i.test(msg)) msg = 'You do not have permission to upload. Make sure you are logged in as an admin.';
+							else if (x.status === 413) msg = 'That file is too large for the server.';
+							rej(new Error(msg || 'Upload failed (' + x.status + ')'));
+						};
+						x.onerror = () => rej(new Error('Network problem. Check your connection and try again.'));
+						x.ontimeout = () => rej(new Error('The upload took too long. Try a smaller file or a better connection.'));
+						x.send(file);
+					});
+					return { name, size: file.size, url: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}` };
+				})();
+			}
+			async function doUpload(file, name) {
+				const row = el('div', { className: 'up-item' }, el('span', { textContent: name }));
+				const bar = el('div', { className: 'bar' }, el('i')); row.append(bar);
+				$('#upList').append(row); busy++; $('#admSave').disabled = true;
+				try { return await uploadFile(file, name, p => { bar.firstChild.style.width = Math.round(p * 100) + '%'; }); }
+				catch (e) { toast(e.message, 6000); return null; }
+				finally { row.remove(); if (!--busy) $('#admSave').disabled = false; }
+			}
+
+			function chipHtml(f, act, k, i) {
+				return `<div class="chip"><i class="bx ${fileIcon(f.name)}"></i><span class="nm">${esc(f.name)}</span>${f.size ? `<small>${fmtSize(f.size)}</small>` : ''}<button class="x" type="button" data-ed="${act}" data-m="${k || ''}" data-i="${i}" aria-label="Remove">&times;</button></div>`;
+			}
+			function modHtml(m, n) {
+				const recHere = rec && rec.k === m.k, last = n === ed.mods.length - 1;
+				const vname = m.video_url ? (/\/course-files\//.test(m.video_url) ? decodeURIComponent(m.video_url.split('/').pop().replace(/^[a-z0-9]{1,8}-/, '')) : m.video_url) : '';
+				return `<div class="ed-mod" data-k="${m.k}">
+					<div class="ed-mod-top"><span class="no">${n + 1}</span><input data-fld="mtitle" data-m="${m.k}" value="${esc(m.title)}" placeholder="Lesson title" maxlength="100">
+						<button type="button" data-ed="up" data-m="${m.k}" ${n ? '' : 'disabled'} aria-label="Move up">&uarr;</button>
+						<button type="button" data-ed="down" data-m="${m.k}" ${last ? 'disabled' : ''} aria-label="Move down">&darr;</button>
+						<button type="button" data-ed="rmmod" data-m="${m.k}" aria-label="Delete lesson" style="color:#dc2626">&times;</button></div>
+					${m.video_url ? `<div class="chip"><i class="bx bx-video"></i><span class="nm">${esc(vname)}</span><button class="x" type="button" data-ed="rmvid" data-m="${m.k}" aria-label="Remove video">&times;</button></div>` : ''}
+					${m.audio_url ? `<audio controls preload="none" src="${esc(m.audio_url)}"></audio><div class="chip"><i class="bx bx-microphone"></i><span class="nm">Voice lesson</span><button class="x" type="button" data-ed="rmaud" data-m="${m.k}" aria-label="Remove voice">&times;</button></div>` : ''}
+					${recHere ? `<div class="rec-live"><i></i><span>Recording <b id="recTime">0:00</b></span><button class="btn btn-sm" type="button" data-ed="stoprec" style="margin-left:auto">Stop</button></div>` : ''}
+					<div class="media-btns">
+						<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-video-plus"></i> Upload video<input type="file" accept="video/*" data-f="video" data-m="${m.k}" hidden></label>
+						<button class="btn btn-sm btn-outline" type="button" data-ed="rec" data-m="${m.k}" ${rec ? 'disabled' : ''}><i class="bx bx-microphone"></i> Record voice</button>
+						<button class="btn btn-sm btn-outline" type="button" data-ed="linkbox" data-m="${m.k}"><i class="bx bx-link"></i> Paste link</button>
+						<label class="btn btn-sm btn-outline up-btn"><i class="bx bx-upload"></i> Add files<input type="file" multiple data-f="mdoc" data-m="${m.k}" hidden></label>
+					</div>
+					${m.linkOpen ? `<div class="ed-row"><input data-fld="newlink" data-m="${m.k}" placeholder="YouTube, Vimeo, .mp4 or any web link" inputmode="url" autocomplete="off"><button class="btn btn-sm" type="button" data-ed="addlink" data-m="${m.k}">Add</button></div><small class="muted">YouTube, Vimeo and .mp4 links play in the lesson. Other links show as a reference link.</small>` : ''}
+					${m.docs.length ? `<div class="chips" style="margin-top:8px">${m.docs.map((f, i) => chipHtml(f, 'rmmdoc', m.k, i)).join('')}</div>` : ''}
+					${m.links.length ? `<div class="chips" style="margin-top:8px">${m.links.map((l, i) => `<div class="chip"><i class="bx bx-link"></i><span class="nm">${esc(l.label || l.url)}</span><button class="x" type="button" data-ed="rmlink" data-m="${m.k}" data-i="${i}" aria-label="Remove link">&times;</button></div>`).join('')}</div>` : ''}
+					<label class="ed-lbl" for="n_${m.k}">Notes for students (optional)</label>
+					<textarea id="n_${m.k}" data-fld="lesson" data-m="${m.k}" placeholder="A short written summary or instructions">${esc(m.lesson)}</textarea>
+				</div>`;
+			}
+			function renderEditor() {
+				$('#cvPrev').innerHTML = ed.cover ? `<img src="${esc(imgSrc(ed.cover))}" alt="Cover preview">` : 'No cover yet';
+				if (document.activeElement !== $('#admImg')) $('#admImg').value = /^https?:/i.test(ed.cover) ? ed.cover : '';
+				$('#edDocs').innerHTML = ed.docs.map((f, i) => chipHtml(f, 'rmcdoc', '', i)).join('');
+				// keep what the admin is typing: save the focused field's caret across the redraw
+				const act = document.activeElement, keep = act && act.closest && act.closest('#edMods') && act.dataset.m ? { f: act.dataset.fld, m: act.dataset.m, a: act.selectionStart } : null;
+				$('#edMods').innerHTML = ed.mods.map(modHtml).join('');
+				if (keep) { const n = $(`#edMods [data-fld="${keep.f}"][data-m="${keep.m}"]`); if (n) { n.focus(); try { n.setSelectionRange(keep.a, keep.a); } catch (e) { /* not a text field */ } } }
+			}
 			function fillForm(r) {
 				editingId = r ? r.id : null;
 				$('#adminFormTitle').textContent = r ? 'Edit course' : 'Add a course';
-				$('#admTitle').value = r ? r.title : ''; $('#admCat').value = r ? r.cat : '';
-				$('#admTags').value = r ? (r.tags || []).join(', ') : ''; $('#admImg').value = r ? r.img : '';
-				$('#admTime').value = r ? r.duration : '';
-				$('#admModules').value = r ? (r.modules || []).map(m => m.lesson ? `${m.title} | ${m.video_url || ''} | ${m.lesson.replace(/\n/g, '\\n')}` : m.video_url ? `${m.title} | ${m.video_url}` : m.title).join('\n') : '';
+				$('#admTitle').value = r ? r.title : ''; $('#admCat').value = r ? (r.cat || '') : '';
+				$('#admTags').value = r ? (r.tags || []).join(', ') : '';
+				$('#admTime').value = r ? (r.duration || '') : '';
 				$('#admPub').checked = r ? r.published : true;
+				ed = {
+					cover: r ? (r.img || '') : '', docs: r && Array.isArray(r.docs) ? r.docs.map(d => ({ ...d })) : [],
+					mods: r ? (r.modules || []).map(m => ({ k: uid(), title: m.title || '', video_url: m.video_url || '', audio_url: m.audio_url || '', lesson: m.lesson || '', docs: Array.isArray(m.docs) ? m.docs.map(d => ({ ...d })) : [], links: Array.isArray(m.links) ? m.links.map(l => ({ ...l })) : [], linkOpen: false })) : [blankMod()]
+				};
+				const cl = $('#catList'); if (cl) cl.innerHTML = [...new Set(adminRows.map(x => x.cat).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
+				renderEditor();
 			}
 
-			function parseModules(text) {
-				return text.split('\n').map(l => l.trim()).filter(Boolean).map(l => {
-					const parts = l.split('|').map(s => s.trim()), m = { title: parts[0] };
-					let rest = parts.slice(1);
-					if (rest.length && (/^https?:\/\/\S+$/i.test(rest[0]) || rest[0] === '')) { if (rest[0]) m.video_url = rest[0]; rest.shift(); }
-					const lesson = rest.join(' | ').replace(/\\n/g, '\n').trim();
-					if (lesson) m.lesson = lesson;
-					return m;
-				});
+			/* ---- voice recording ---- */
+			async function startRec(k) {
+				if (rec) return;
+				if (!navigator.mediaDevices || !window.MediaRecorder) return toast('This browser cannot record. Upload an audio file with "Add files" instead.', 5000);
+				let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+				catch (e) { return toast('Microphone is blocked. Allow it in the browser settings, then try again.', 5000); }
+				const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+				const mr = type ? new MediaRecorder(stream, { mimeType: type }) : new MediaRecorder(stream), chunks = [];
+				mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+				rec = { k, mr, t0: Date.now(), timer: setInterval(() => {
+					const sec = Math.floor((Date.now() - rec.t0) / 1000), t = $('#recTime');
+					if (t) t.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+					if (sec >= 900) stopRec();                       // 15 minute cap
+				}, 500) };
+				mr.onstop = async () => {
+					clearInterval(rec.timer); stream.getTracks().forEach(t => t.stop());
+					const mime = mr.mimeType || type || 'audio/webm', ext = /mp4/.test(mime) ? 'm4a' : /ogg/.test(mime) ? 'ogg' : 'webm', kk = rec.k;
+					rec = null; renderEditor();
+					const blob = new Blob(chunks, { type: mime });
+					if (blob.size < 500) return toast('Nothing was recorded. Try again.');
+					const f = await doUpload(blob, `voice-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${ext}`);
+					const m = modOf(kk); if (f && m) { m.audio_url = f.url; renderEditor(); toast('Voice saved. Press Save course to publish it.'); }
+				};
+				mr.start(1000); renderEditor();
+			}
+			function stopRec() { if (rec && rec.mr.state !== 'inactive') rec.mr.stop(); }
+
+			/* ---- builder events ---- */
+			async function onEdFile(inp) {
+				const files = [...inp.files]; inp.value = '';
+				if (!files.length) return;
+				const m = inp.dataset.m ? modOf(inp.dataset.m) : null, kind = inp.dataset.f;
+				if (kind === 'cover') {
+					let blob = files[0], name = files[0].name;
+					try { blob = await resizeImage(files[0], 1200); name = 'cover.jpg'; } catch (e) { return toast('That is not a picture. Pick a JPG or PNG.'); }
+					const f = await doUpload(blob, name); if (f) { ed.cover = f.url; renderEditor(); }
+					return;
+				}
+				for (const file of files) {
+					const f = await doUpload(file, file.name); if (!f) continue;
+					if (kind === 'video') { if (m) m.video_url = f.url; }
+					else if (kind === 'mdoc' && m) {
+						if (/^audio\//.test(file.type) && !m.audio_url) m.audio_url = f.url; else m.docs.push({ name: f.name, url: f.url, size: f.size });
+					} else if (kind === 'cdoc') ed.docs.push({ name: f.name, url: f.url, size: f.size });
+					renderEditor();
+				}
+			}
+			function onEdClick(b) {
+				const a = b.dataset.ed, m = b.dataset.m ? modOf(b.dataset.m) : null, i = +b.dataset.i;
+				if (a === 'addmod') { ed.mods.push(blankMod()); renderEditor(); const t = $$('#edMods input[data-fld="mtitle"]').pop(); if (t) t.focus(); return; }
+				if (a === 'rmcdoc') ed.docs.splice(i, 1);
+				else if (!m) return;
+				else if (a === 'rmmod') { if (rec && rec.k === m.k) return toast('Stop the recording first.'); if ((m.title || m.video_url || m.audio_url || m.lesson || m.docs.length) && !confirm('Delete this lesson?')) return; ed.mods.splice(ed.mods.indexOf(m), 1); if (!ed.mods.length) ed.mods.push(blankMod()); }
+				else if (a === 'up' || a === 'down') { const j = ed.mods.indexOf(m), t = a === 'up' ? j - 1 : j + 1; if (t < 0 || t >= ed.mods.length) return; ed.mods.splice(j, 1); ed.mods.splice(t, 0, m); }
+				else if (a === 'rmvid') m.video_url = '';
+				else if (a === 'rmaud') m.audio_url = '';
+				else if (a === 'rmmdoc') m.docs.splice(i, 1);
+				else if (a === 'rmlink') m.links.splice(i, 1);
+				else if (a === 'linkbox') m.linkOpen = !m.linkOpen;
+				else if (a === 'rec') return startRec(m.k);
+				else if (a === 'addlink') {
+					const inp = $(`#edMods [data-fld="newlink"][data-m="${m.k}"]`), u = (inp && inp.value || '').trim();
+					if (!httpUrl(u)) return toast('Paste a full link that starts with https://');
+					if (toEmbed(u)) m.video_url = u;
+					else { let host = u; try { host = new URL(u).hostname.replace(/^www\./, ''); } catch (e) { /* keep raw */ } m.links.push({ label: host, url: u }); }
+					m.linkOpen = false;
+				}
+				renderEditor();
 			}
 
 			async function saveCourse(ev) {
 				ev.preventDefault();
-				const modules = parseModules($('#admModules').value);
-				if (!modules.length) return toast('Add at least one module');
+				if (busy) return toast('Wait for the uploads to finish.');
+				if (rec) return toast('Stop the recording first.');
+				const title = $('#admTitle').value.trim();
+				if (!title) { $('#admTitle').focus(); return toast('Give the course a title.'); }
+				const bad = ed.mods.findIndex(m => !m.title.trim() && (m.video_url || m.audio_url || m.lesson.trim() || m.docs.length || m.links.length));
+				if (bad >= 0) return toast(`Lesson ${bad + 1} needs a title.`);
+				const mods = ed.mods.filter(m => m.title.trim());
+				if (!mods.length) return toast('Add at least one lesson with a title.');
+				const modules = mods.map(m => {
+					const o = { title: m.title.trim() };
+					if (m.video_url) o.video_url = m.video_url; if (m.audio_url) o.audio_url = m.audio_url;
+					if (m.lesson.trim()) o.lesson = m.lesson.trim();
+					if (m.docs.length) o.docs = m.docs; if (m.links.length) o.links = m.links;
+					return o;
+				});
 				const old = adminRows.find(r => r.id === editingId);
-				let id = editingId || slug($('#admTitle').value);
-				if (!editingId && adminRows.some(r => r.id === id)) id += '-' + Math.random().toString(36).slice(2, 5);
+				let id = editingId || slug(title);
+				if (!editingId && adminRows.some(r => r.id === id)) id += '-' + uid().slice(0, 3);
 				const row = {
-					id, title: $('#admTitle').value.trim(), cat: $('#admCat').value.trim(),
+					id, title, cat: $('#admCat').value.trim(),
 					tags: $('#admTags').value.split(',').map(t => t.trim()).filter(Boolean),
-					img: $('#admImg').value.trim() || 'students.png', duration: $('#admTime').value.trim(),
-					modules, videos: String(modules.length), views: old ? old.views : '0', rating: old ? old.rating : '5.0',
+					img: ed.cover || 'students.png', duration: $('#admTime').value.trim(),
+					modules, docs: ed.docs, videos: String(modules.length), views: old ? old.views : '0', rating: old ? old.rating : '5.0',
 					published: $('#admPub').checked, position: old ? old.position : (adminRows.reduce((m, r) => Math.max(m, r.position || 0), 0) + 1)
 				};
-				const { error } = await sb.from('courses').upsert(row);
-				if (error) return toast('Save failed: ' + error.message);
-				toast('Course saved'); fillForm(null);
-				await Promise.all([renderAdmin(), loadCourses()]);
+				const btn = $('#admSave'); btn.disabled = true; btn.textContent = 'Saving…';
+				try {
+					let { error } = await sb.from('courses').upsert(row);
+					let note = '';
+					if (error && /docs/i.test(error.message)) {      // upgrade_v4.sql not run yet: save without course-level files
+						const { docs, ...rest } = row; ({ error } = await sb.from('courses').upsert(rest));
+						if (!error && docs.length) note = ' Course documents were not saved: run upgrade_v4.sql in Supabase.';
+					}
+					if (error) return toast('Save failed: ' + error.message, 6000);
+					toast('Course saved.' + note, note ? 7000 : 0); fillForm(null);
+					await Promise.all([renderAdmin(), loadCourses()]);
+					window.scrollTo({ top: 0, behavior: 'smooth' });
+				} catch (e) {
+					toast(isNetworkError(e) ? 'No connection. Your form is still here. Try Save again.' : 'Save failed: ' + e.message, 5000);
+				} finally { btn.textContent = 'Save course'; btn.disabled = !!busy; }
 			}
 
 			async function generateQuiz(id, btn) {
@@ -3059,12 +3322,26 @@
 			}
 
 			function initAdmin() {
-				$('#adminForm').addEventListener('submit', saveCourse);
-				$('#admReset').onclick = () => fillForm(null);
+				const f = $('#adminForm');
+				f.addEventListener('submit', saveCourse);
+				$('#admReset').onclick = () => { if (!busy && !rec) fillForm(null); else toast('Wait for the upload or recording to finish.'); };
+				fillForm(null);
+				f.addEventListener('click', ev => { const b = ev.target.closest('button[data-ed]'); if (b) onEdClick(b); if (ev.target.closest('button[data-ed="stoprec"]')) stopRec(); });
+				f.addEventListener('change', ev => { const i = ev.target; if (i.type === 'file') onEdFile(i); else if (i.dataset.fld === 'cover') { ed.cover = i.value.trim(); renderEditor(); } });
+				f.addEventListener('input', ev => {
+					const i = ev.target, m = i.dataset.m ? modOf(i.dataset.m) : null;
+					if (i.dataset.fld === 'mtitle' && m) m.title = i.value; else if (i.dataset.fld === 'lesson' && m) m.lesson = i.value;
+					else if (i.dataset.fld === 'cover') { ed.cover = i.value.trim(); $('#cvPrev').innerHTML = ed.cover ? `<img src="${esc(imgSrc(ed.cover))}" alt="Cover preview">` : 'No cover yet'; }
+				});
+				f.addEventListener('keydown', ev => {
+					if (ev.key === 'Enter' && ev.target.dataset.fld === 'newlink') { ev.preventDefault(); const b = $(`button[data-ed="addlink"][data-m="${ev.target.dataset.m}"]`); if (b) b.click(); }
+					else if (ev.key === 'Enter' && ev.target.tagName === 'INPUT') ev.preventDefault();
+				});
+				window.addEventListener('beforeunload', e => { if (busy || rec) { e.preventDefault(); e.returnValue = ''; } });
 				$('#adminList').addEventListener('click', async ev => {
 					const b = ev.target.closest('button[data-adm]'); if (!b) return;
 					const r = adminRows.find(x => x.id === b.dataset.id); if (!r) return;
-					if (b.dataset.adm === 'edit') { fillForm(r); $('#adminForm').scrollIntoView({ behavior: 'smooth' }); }
+					if (b.dataset.adm === 'edit') { if (busy || rec) return toast('Wait for the upload or recording to finish.'); fillForm(r); f.scrollIntoView({ behavior: 'smooth' }); }
 					else if (b.dataset.adm === 'quiz') generateQuiz(r.id, b);
 					else if (b.dataset.adm === 'del' && confirm(`Delete "${r.title}"? Students' progress records stay, but the course disappears.`)) {
 						const { error } = await sb.from('courses').delete().eq('id', r.id);
@@ -3587,9 +3864,65 @@
 
 			document.addEventListener('DOMContentLoaded', init);
 
-			/* PWA: register the service worker after the page has loaded */
+			/* =================================================================
+			   17. PWA: install button, update notice, service worker
+			   ================================================================= */
+			let installEvt = null;
+			const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+			const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+			function paintInstall() {
+				const panel = $('#installPanel'); if (!panel) return;
+				if (isStandalone()) { panel.classList.add('hidden'); return; }
+				const btn = $('#installBtn'), txt = $('#installText');
+				if (installEvt) { panel.classList.remove('hidden'); btn.classList.remove('hidden'); }
+				else if (isIOS) {
+					panel.classList.remove('hidden'); btn.classList.add('hidden');
+					txt.textContent = 'On iPhone or iPad: tap the Share button in Safari, then "Add to Home Screen".';
+				} else panel.classList.add('hidden');
+			}
+			window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; paintInstall(); });
+			window.addEventListener('appinstalled', () => { installEvt = null; paintInstall(); toast('App installed. Open it from your home screen.'); });
+			document.addEventListener('DOMContentLoaded', () => {
+				paintInstall();
+				const b = $('#installBtn');
+				if (b) b.onclick = async () => {
+					if (!installEvt) return;
+					installEvt.prompt();
+					try { await installEvt.userChoice; } catch (e) { /* dismissed */ }
+					installEvt = null; paintInstall();
+				};
+			});
+
+			function showUpdate(reg) {
+				if ($('#updateBar')) return;
+				const bar = el('div', { className: 'update-bar', id: 'updateBar', role: 'status' }, el('span', { textContent: 'A new version is ready.' }));
+				const b = el('button', { className: 'btn', type: 'button', textContent: 'Update' });
+				b.onclick = () => { b.disabled = true; if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING'); else location.reload(); };
+				bar.append(b); document.body.append(bar);
+			}
 			if ('serviceWorker' in navigator) {
-				window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => { }));
+				let reloading = false;
+				navigator.serviceWorker.addEventListener('controllerchange', () => {
+					if (reloading || !sessionStorage.getItem('swUpdating')) return;     // only reload when the user tapped Update
+					reloading = true; location.reload();
+				});
+				window.addEventListener('load', async () => {
+					try { sessionStorage.removeItem('swUpdating'); } catch (e) { }
+					try {
+						const reg = await navigator.serviceWorker.register('./sw.js');
+						const watch = r => {
+							if (r.waiting && navigator.serviceWorker.controller) showUpdate(r);
+							r.addEventListener('updatefound', () => {
+								const w = r.installing;
+								if (w) w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) showUpdate(r); });
+							});
+						};
+						watch(reg);
+						document.addEventListener('click', ev => { if (ev.target.closest('#updateBar button')) { try { sessionStorage.setItem('swUpdating', '1'); } catch (e) { } } }, true);
+						document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => { }); });
+						setInterval(() => reg.update().catch(() => { }), 60 * 60 * 1000);
+					} catch (e) { /* service workers unavailable (private mode / http) */ }
+				});
 			}
 		})();
 	</script>
