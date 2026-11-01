@@ -2415,6 +2415,7 @@
 			/* Backend for the chatbot: POST {message, history} -> {reply}.
 			   Keep any AI API key on the server (e.g. a Supabase Edge Function). */
 			const FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
+			const TRANSCRIBE_ENDPOINT = FUNCTIONS_URL + '/transcribe';
 			const CHATBOT_ENDPOINT = FUNCTIONS_URL + '/chat';              // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/chat
 			const QUIZ_ENDPOINT = FUNCTIONS_URL + '/generate-quiz';        // https://jctijixeslyimbqkucyb.supabase.co/functions/v1/generate-quiz
 			const PASS_MARK = 0.6;
@@ -2981,9 +2982,19 @@
 					const audio = aud ? `<div class="panel audio-panel"><strong><i class="bx bx-headphone"></i> Listen to this lesson</strong><audio controls preload="none" src="${esc(aud)}"></audio></div>` : '';
 					const files = mdocs.length ? `<div class="panel"><h3 style="margin-bottom:10px">Lesson files</h3>${fileRows(mdocs)}</div>` : '';
 					const refs = mlinks.length ? `<div class="panel"><h3 style="margin-bottom:10px">Useful links</h3>${mlinks.filter(l => httpUrl(l.url)).map(l => `<a class="file-row" href="${esc(l.url)}" target="_blank" rel="noopener"><i class="bx bx-link-external"></i><span>${esc(l.label || l.url)}</span></a>`).join('')}</div>` : '';
-					const soon = !url && !text && !aud && !mdocs.length && !mlinks.length ? `<div class="panel soon"><i class="bx bx-time-five"></i><h3>Lesson coming soon</h3><p>This lesson is being prepared. You can still take the quiz.</p></div>` : '';
-				box.innerHTML = `<a class="back" href="#/course/${esc(id)}"><i class="bx bx-arrow-back"></i> ${esc(c.title)}</a><p class="sub-title">Module ${i + 1} of ${c.modules.length}</p><h2 class="heading">${esc(c.modules[i])}</h2>${media}${audio}${body}${files}${refs}${soon}
+					const tr = c.transcripts && c.transcripts[i];
+					const trans = tr ? `<div class="panel"><h3 style="margin-bottom:10px"><i class="bx bx-captions"></i> Transcript</h3><div class="media-btns" style="margin-top:0"><button class="btn btn-sm btn-outline" type="button" data-tts="play"><i class="bx bx-volume-full"></i> Read aloud</button><button class="btn btn-sm btn-outline" type="button" data-tts="stop"><i class="bx bx-stop-circle"></i> Stop</button><button class="btn btn-sm btn-outline" type="button" data-tts="dl"><i class="bx bx-download"></i> Download</button></div><div class="lesson-text" style="max-height:320px;overflow:auto">${tr.split(/\n+/).filter(Boolean).map(p => `<p>${esc(p)}</p>`).join('')}</div></div>` : '';
+					const soon = !url && !text && !aud && !mdocs.length && !mlinks.length && !tr ? `<div class="panel soon"><i class="bx bx-time-five"></i><h3>Lesson coming soon</h3><p>This lesson is being prepared. You can still take the quiz.</p></div>` : '';
+				box.innerHTML = `<a class="back" href="#/course/${esc(id)}"><i class="bx bx-arrow-back"></i> ${esc(c.title)}</a><p class="sub-title">Module ${i + 1} of ${c.modules.length}</p><h2 class="heading">${esc(c.modules[i])}</h2>${media}${audio}${trans}${body}${files}${refs}${soon}
 					<div class="step-row">${i > 0 ? `<button class="btn btn-outline" data-go="#/lesson/${esc(id)}/${i - 1}">← Previous</button>` : '<span></span>'}<button class="btn" data-go="#/quiz/${esc(id)}/${i}">Take the quiz →</button></div>`;
+				box.onclick = ev => {
+					const b = ev.target.closest('[data-tts]'); if (!b) return;
+					const txt = (tr || '').trim(), a = b.dataset.tts;
+					if (a === 'dl') { const u = URL.createObjectURL(new Blob([txt], { type: 'text/plain' })), l = el('a', { href: u, download: safeName(c.modules[i]) + '-transcript.txt' }); document.body.append(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 3000); return; }
+					if (!window.speechSynthesis) return toast('This browser cannot read aloud.');
+					speechSynthesis.cancel(); if (a === 'stop') return;
+					(txt.match(/[^.!?\n]+[.!?]*/g) || []).forEach(part => { if (part.trim()) speechSynthesis.speak(new SpeechSynthesisUtterance(part.trim())); });
+				};
 			}
 
 			/* =================================================================
@@ -3004,7 +3015,7 @@
 						img: r.img || 'students.png', videos: r.videos || String(mods.length), views: r.views || '0',
 						time: r.duration || '', rating: r.rating || '5.0',
 						modules: mods.map(m => m.title), links: mods.map(m => m.video_url || ''), lessons: mods.map(m => m.lesson || ''),
-						audios: mods.map(m => m.audio_url || ''), mdocs: mods.map(m => Array.isArray(m.docs) ? m.docs : []), mlinks: mods.map(m => Array.isArray(m.links) ? m.links : []),
+						audios: mods.map(m => m.audio_url || ''), transcripts: mods.map(m => m.transcript || ''), mdocs: mods.map(m => Array.isArray(m.docs) ? m.docs : []), mlinks: mods.map(m => Array.isArray(m.links) ? m.links : []),
 						docs: Array.isArray(r.docs) ? r.docs : []
 					};
 				});
@@ -3079,7 +3090,7 @@
 			const BUCKET = 'course-files', MAX_UPLOAD = 50 * 1024 * 1024;
 			let ed = { cover: '', docs: [], mods: [] }, busy = 0, rec = null;
 			const uid = () => Math.random().toString(36).slice(2, 8);
-			const blankMod = () => ({ k: uid(), title: '', video_url: '', audio_url: '', lesson: '', docs: [], links: [], linkOpen: false });
+			const blankMod = () => ({ k: uid(), title: '', video_url: '', audio_url: '', lesson: '', transcript: '', docs: [], links: [], linkOpen: false });
 			const safeName = n => (String(n).normalize('NFKD').replace(/[^\w.\-]+/g, '_').replace(/^_+|_+$/g, '').slice(-80)) || 'file';
 			const fmtSize = b => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB';
 			const httpUrl = u => /^https?:\/\/\S+$/i.test(u || '') ? u : '';
@@ -3153,6 +3164,9 @@
 					${m.links.length ? `<div class="chips" style="margin-top:8px">${m.links.map((l, i) => `<div class="chip"><i class="bx bx-link"></i><span class="nm">${esc(l.label || l.url)}</span><button class="x" type="button" data-ed="rmlink" data-m="${m.k}" data-i="${i}" aria-label="Remove link">&times;</button></div>`).join('')}</div>` : ''}
 					<label class="ed-lbl" for="n_${m.k}">Notes for students (optional)</label>
 					<textarea id="n_${m.k}" data-fld="lesson" data-m="${m.k}" placeholder="A short written summary or instructions">${esc(m.lesson)}</textarea>
+					<label class="ed-lbl" for="t_${m.k}">Transcript (students can read, listen and download it)</label>
+					<textarea id="t_${m.k}" data-fld="transcript" data-m="${m.k}" placeholder="Type or paste a transcript, or tap Transcribe">${esc(m.transcript)}</textarea>
+					<div class="media-btns"><button class="btn btn-sm btn-outline" type="button" data-ed="transcribe" data-m="${m.k}" ${m.tbusy ? 'disabled' : ''}><i class="bx bx-captions"></i> ${m.tbusy ? 'Transcribing…' : 'Transcribe video / voice / file'}</button></div>
 				</div>`;
 			}
 			function renderEditor() {
@@ -3173,7 +3187,7 @@
 				$('#admPub').checked = r ? r.published : true;
 				ed = {
 					cover: r ? (r.img || '') : '', docs: r && Array.isArray(r.docs) ? r.docs.map(d => ({ ...d })) : [],
-					mods: r ? (r.modules || []).map(m => ({ k: uid(), title: m.title || '', video_url: m.video_url || '', audio_url: m.audio_url || '', lesson: m.lesson || '', docs: Array.isArray(m.docs) ? m.docs.map(d => ({ ...d })) : [], links: Array.isArray(m.links) ? m.links.map(l => ({ ...l })) : [], linkOpen: false })) : [blankMod()]
+					mods: r ? (r.modules || []).map(m => ({ k: uid(), title: m.title || '', video_url: m.video_url || '', audio_url: m.audio_url || '', lesson: m.lesson || '', transcript: m.transcript || '', docs: Array.isArray(m.docs) ? m.docs.map(d => ({ ...d })) : [], links: Array.isArray(m.links) ? m.links.map(l => ({ ...l })) : [], linkOpen: false })) : [blankMod()]
 				};
 				const cl = $('#catList'); if (cl) cl.innerHTML = [...new Set(adminRows.map(x => x.cat).filter(Boolean))].map(c => `<option value="${esc(c)}">`).join('');
 				renderEditor();
@@ -3239,6 +3253,7 @@
 				else if (a === 'rmlink') m.links.splice(i, 1);
 				else if (a === 'linkbox') m.linkOpen = !m.linkOpen;
 				else if (a === 'rec') return startRec(m.k);
+				else if (a === 'transcribe') return transcribeMod(m);
 				else if (a === 'addlink') {
 					const inp = $(`#edMods [data-fld="newlink"][data-m="${m.k}"]`), u = (inp && inp.value || '').trim();
 					if (!httpUrl(u)) return toast('Paste a full link that starts with https://');
@@ -3247,6 +3262,32 @@
 					m.linkOpen = false;
 				}
 				renderEditor();
+			}
+
+			/* ask the server (Gemini) to turn a lesson's video, voice note or document into text */
+			async function transcribeMod(m) {
+				const own = u => u && u.indexOf('/storage/v1/object/public/' + BUCKET + '/') > -1;
+				const src = own(m.audio_url) ? { url: m.audio_url } : own(m.video_url) ? { url: m.video_url }
+					: (m.docs.find(d => own(d.url) && /\.(pdf|txt|md|mp3|m4a|wav|ogg|webm|mp4|mov)$/i.test(d.name)) || null);
+				if (!src) return toast('Upload a video, record a voice note, or add a PDF or audio file to this lesson first.', 5000);
+				m.tbusy = true; renderEditor(); toast('Transcribing. This can take a minute or two.', 6000);
+				try {
+					const { data } = await sb.auth.getSession();
+					if (!data.session) throw new Error('Please log in again.');
+					const r = await fetch(TRANSCRIBE_ENDPOINT, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + data.session.access_token },
+						signal: AbortSignal.timeout ? AbortSignal.timeout(170000) : undefined,
+						body: JSON.stringify({ url: src.url })
+					});
+					let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
+					if (!r.ok || !j || !j.text) throw new Error((j && (j.error || j.message)) || 'Server error ' + r.status);
+					m.transcript = (m.transcript.trim() ? m.transcript.trim() + '\n\n' : '') + j.text.trim();
+					toast('Transcript ready. Check it, then press Save course.', 5000);
+				} catch (e) {
+					const net = e instanceof TypeError || e.name === 'TimeoutError' || e.name === 'AbortError';
+					toast('Could not transcribe: ' + (net ? 'no response from the server. Is the transcribe function deployed?' : e.message), 7000);
+				} finally { m.tbusy = false; renderEditor(); }
 			}
 
 			async function saveCourse(ev) {
@@ -3262,7 +3303,7 @@
 				const modules = mods.map(m => {
 					const o = { title: m.title.trim() };
 					if (m.video_url) o.video_url = m.video_url; if (m.audio_url) o.audio_url = m.audio_url;
-					if (m.lesson.trim()) o.lesson = m.lesson.trim();
+					if (m.lesson.trim()) o.lesson = m.lesson.trim(); if (m.transcript.trim()) o.transcript = m.transcript.trim();
 					if (m.docs.length) o.docs = m.docs; if (m.links.length) o.links = m.links;
 					return o;
 				});
@@ -3330,7 +3371,7 @@
 				f.addEventListener('change', ev => { const i = ev.target; if (i.type === 'file') onEdFile(i); else if (i.dataset.fld === 'cover') { ed.cover = i.value.trim(); renderEditor(); } });
 				f.addEventListener('input', ev => {
 					const i = ev.target, m = i.dataset.m ? modOf(i.dataset.m) : null;
-					if (i.dataset.fld === 'mtitle' && m) m.title = i.value; else if (i.dataset.fld === 'lesson' && m) m.lesson = i.value;
+					if (i.dataset.fld === 'mtitle' && m) m.title = i.value; else if (i.dataset.fld === 'lesson' && m) m.lesson = i.value; else if (i.dataset.fld === 'transcript' && m) m.transcript = i.value;
 					else if (i.dataset.fld === 'cover') { ed.cover = i.value.trim(); $('#cvPrev').innerHTML = ed.cover ? `<img src="${esc(imgSrc(ed.cover))}" alt="Cover preview">` : 'No cover yet'; }
 				});
 				f.addEventListener('keydown', ev => {
